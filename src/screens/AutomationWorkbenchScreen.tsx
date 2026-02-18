@@ -18,7 +18,7 @@ export function AutomationWorkbenchScreen() {
   } = useAutomationWorkbench()
 
   return (
-    <main className="workbench-shell">
+    <main className="workbench-shell" aria-busy={state.isRunning}>
       <WorkbenchHeader knowledgeReady={state.knowledgeReady} />
 
       <section className="workbench-frame">
@@ -54,6 +54,17 @@ export function AutomationWorkbenchScreen() {
           </div>
         </div>
       </section>
+
+      {state.isRunning ? (
+        <div className="run-overlay" role="status" aria-live="assertive" aria-label="AI körs">
+          <div className="run-overlay-card">
+            <p>KÖR...</p>
+            <div className="run-overlay-track" aria-hidden="true">
+              <span />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   )
 }

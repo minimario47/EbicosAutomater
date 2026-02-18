@@ -1,6 +1,7 @@
 .workbench-shell {
   min-height: 100vh;
   background: var(--paper);
+  position: relative;
 }
 
 .workbench-header {
@@ -266,12 +267,65 @@
   padding-left: 18px;
 }
 
+.run-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(255, 255, 255, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.run-overlay-card {
+  width: min(92vw, 440px);
+  border: var(--line-base) solid var(--ink);
+  background: var(--paper);
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.run-overlay-card p {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-code);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.run-overlay-track {
+  border: var(--line-thin) solid var(--ink);
+  height: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.run-overlay-track span {
+  position: absolute;
+  top: 0;
+  left: -34%;
+  width: 34%;
+  height: 100%;
+  background: var(--ink);
+  animation: runPulse 1100ms linear infinite;
+}
+
 @keyframes panelSweep {
   from {
     clip-path: inset(0 100% 0 0);
   }
   to {
     clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes runPulse {
+  from {
+    left: -34%;
+  }
+  to {
+    left: 100%;
   }
 }
 
