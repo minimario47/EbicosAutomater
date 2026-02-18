@@ -5,14 +5,10 @@ interface InputPanelProps {
   sourceCode: string
   intent: string
   notes: string
-  apiKey: string
-  model: string
   isRunning: boolean
   onSourceCodeChange: (value: string) => void
   onIntentChange: (value: string) => void
   onNotesChange: (value: string) => void
-  onApiKeyChange: (value: string) => void
-  onModelChange: (value: string) => void
   onRun: () => void
 }
 
@@ -33,14 +29,10 @@ export function InputPanel({
   sourceCode,
   intent,
   notes,
-  apiKey,
-  model,
   isRunning,
   onSourceCodeChange,
   onIntentChange,
   onNotesChange,
-  onApiKeyChange,
-  onModelChange,
   onRun,
 }: InputPanelProps) {
   return (
@@ -63,6 +55,7 @@ export function InputPanel({
         placeholder={modePlaceholder[mode]}
         spellCheck={false}
       />
+      <p className="field-hint">Klistra in EBICOS-kod eller lämna tom vid ny skapning.</p>
 
       <label className="field-label" htmlFor="intent-text">
         AVSIKT
@@ -75,6 +68,7 @@ export function InputPanel({
         placeholder="ATB 327 med säker stoppsekvens"
         spellCheck={false}
       />
+      <p className="field-hint">Beskriv kort vad automaten ska göra.</p>
 
       <label className="field-label" htmlFor="notes-text">
         NOTERING
@@ -86,36 +80,7 @@ export function InputPanel({
         onChange={(event) => onNotesChange(event.target.value)}
         placeholder="Valfri operatörskontext"
       />
-
-      <div className="credential-grid">
-        <div>
-          <label className="field-label" htmlFor="model-name">
-            MODELL
-          </label>
-          <input
-            id="model-name"
-            className="single-input"
-            value={model}
-            onChange={(event) => onModelChange(event.target.value)}
-            placeholder="gpt-5.2-codex"
-          />
-        </div>
-
-        <div>
-          <label className="field-label" htmlFor="api-key">
-            NYCKEL
-          </label>
-          <input
-            id="api-key"
-            className="single-input"
-            type="password"
-            value={apiKey}
-            onChange={(event) => onApiKeyChange(event.target.value)}
-            placeholder="sk-..."
-            autoComplete="off"
-          />
-        </div>
-      </div>
+      <p className="field-hint">Valfri kontext: station, objekt, begränsningar.</p>
     </section>
   )
 }

@@ -1,11 +1,11 @@
 const KNOWLEDGE_SOURCES = [
   {
     id: 'AUTOMATER7',
-    path: '/knowledge/Automater7.txt',
+    path: 'knowledge/Automater7.txt',
   },
   {
     id: 'KORPLAN8',
-    path: '/knowledge/Korplan8.txt',
+    path: 'knowledge/Korplan8.txt',
   },
 ] as const
 
@@ -80,9 +80,10 @@ async function loadChunks(): Promise<KnowledgeChunk[]> {
 
   const loadedSources = await Promise.all(
     KNOWLEDGE_SOURCES.map(async (source) => {
-      const response = await fetch(source.path)
+      const resolvedPath = withBase(source.path)
+      const response = await fetch(resolvedPath)
       if (!response.ok) {
-        throw new Error(`Kunde inte läsa EBICOS-referensen: ${source.path}`)
+        throw new Error(`Kunde inte läsa EBICOS-referensen: ${resolvedPath}`)
       }
       return {
         sourceId: source.id,
@@ -258,4 +259,11 @@ function overlapScore(queryTerms: string[], chunkTerms: string[]): number {
     }
   }
   return score
+}
+
+function withBase(path: string): string {
+  const base = import.meta.env.BASE_URL || '/'
+  const normalizedBase = base.endsWith('/') ? base : `${base}/`
+  const normalizedPath = path.replace(/^\//, '')
+  return `${normalizedBase}${normalizedPath}`
 }

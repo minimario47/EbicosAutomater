@@ -16,8 +16,9 @@ Appen hämtar AI-kontext från:
 ## Säkerhet
 GitHub Pages är statisk hosting. GitHub Secrets kan inte användas som hemlig runtime-nyckel i klienten.
 
-- API-nyckeln används i webbläsaren.
-- Lägg inte in produktionsnycklar i frontendkod.
+- Appen läser `VITE_OPENAI_API_KEY` vid build.
+- Sätt repo-secret `OPENAI_API_KEY` för GitHub Actions deploy.
+- Om nyckeln saknas visas fel i UI och AI-körning stoppas.
 
 ## Lokalt
 ```bash

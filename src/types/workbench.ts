@@ -27,7 +27,6 @@ export interface AiResult {
 
 export interface RunRequest {
   apiKey: string
-  model: string
   mode: AutomationMode
   sourceCode: string
   intent: string

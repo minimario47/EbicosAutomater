@@ -1,14 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ensureEbicosKnowledge, retrieveEbicosContext } from '../services/ebicosKnowledge'
 import { validateAutomation } from '../services/automationValidator'
-import {
-  loadDraft,
-  loadModel,
-  loadSessionApiKey,
-  saveDraft,
-  saveModel,
-  saveSessionApiKey,
-} from '../services/draftStore'
+import { loadDraft, saveDraft } from '../services/draftStore'
 import { runEbicosAssistant } from '../services/openaiClient'
 import type { AiResult, AutomationMode, RunRequest, ValidationIssue } from '../types/workbench'
 
@@ -17,8 +10,6 @@ interface WorkbenchState {
   sourceCode: string
   intent: string
   notes: string
-  apiKey: string
-  model: string
   result: AiResult | null
   issues: ValidationIssue[]
   isRunning: boolean
@@ -35,8 +26,6 @@ export function useAutomationWorkbench() {
     sourceCode: draft.sourceCode,
     intent: draft.intent,
     notes: draft.notes,
-    apiKey: loadSessionApiKey(),
-    model: loadModel(),
     result: null,
     issues: computeIssues(draft.mode, draft.sourceCode),
     isRunning: false,
@@ -63,10 +52,7 @@ export function useAutomationWorkbench() {
       intent: state.intent,
       notes: state.notes,
     })
-
-    saveSessionApiKey(state.apiKey)
-    saveModel(state.model)
-  }, [state.mode, state.sourceCode, state.intent, state.notes, state.apiKey, state.model])
+  }, [state.mode, state.sourceCode, state.intent, state.notes])
 
   const setMode = (mode: AutomationMode) => {
     setState((current) => ({
@@ -94,26 +80,14 @@ export function useAutomationWorkbench() {
     setState((current) => ({ ...current, notes, lastSavedAt: nowStamp() }))
   }
 
-  const setApiKey = (apiKey: string) => {
-    setState((current) => ({ ...current, apiKey }))
-  }
-
-  const setModel = (model: string) => {
-    setState((current) => ({ ...current, model }))
-  }
-
   const clearResult = () => {
     setState((current) => ({ ...current, result: null, error: '' }))
   }
 
   const run = async () => {
-    if (!state.apiKey.trim()) {
-      setState((current) => ({ ...current, error: 'API-nyckel saknas.' }))
-      return
-    }
-
-    if (!state.model.trim()) {
-      setState((current) => ({ ...current, error: 'Modellnamn saknas.' }))
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY?.trim() ?? ''
+    if (!apiKey) {
+      setState((current) => ({ ...current, error: 'API-nyckel saknas i miljön (VITE_OPENAI_API_KEY).' }))
       return
     }
 
@@ -138,8 +112,7 @@ export function useAutomationWorkbench() {
       )
 
       const request: RunRequest = {
-        apiKey: state.apiKey.trim(),
-        model: state.model.trim(),
+        apiKey,
         mode: state.mode,
         sourceCode: state.sourceCode,
         intent: state.intent,
@@ -169,8 +142,6 @@ export function useAutomationWorkbench() {
     setSourceCode,
     setIntent,
     setNotes,
-    setApiKey,
-    setModel,
     clearResult,
     run,
   }

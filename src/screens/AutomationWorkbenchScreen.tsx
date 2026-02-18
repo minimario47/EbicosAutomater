@@ -12,8 +12,6 @@ export function AutomationWorkbenchScreen() {
     setSourceCode,
     setIntent,
     setNotes,
-    setApiKey,
-    setModel,
     run,
   } = useAutomationWorkbench()
 
@@ -33,14 +31,10 @@ export function AutomationWorkbenchScreen() {
               sourceCode={state.sourceCode}
               intent={state.intent}
               notes={state.notes}
-              apiKey={state.apiKey}
-              model={state.model}
               isRunning={state.isRunning}
               onSourceCodeChange={setSourceCode}
               onIntentChange={setIntent}
               onNotesChange={setNotes}
-              onApiKeyChange={setApiKey}
-              onModelChange={setModel}
               onRun={run}
             />
 

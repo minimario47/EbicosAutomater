@@ -16,6 +16,8 @@ interface OpenAiInputFile {
   file_data: string
 }
 
+const MODEL_NAME = 'gpt-5.2-codex'
+
 let pdfInputCache: OpenAiInputFile[] | null = null
 
 export async function runEbicosAssistant(
@@ -34,7 +36,7 @@ export async function runEbicosAssistant(
       Authorization: `Bearer ${request.apiKey}`,
     },
     body: JSON.stringify({
-      model: request.model,
+      model: MODEL_NAME,
       input: [
         {
           role: 'system',
@@ -202,8 +204,8 @@ async function loadObligatoryPdfInputs(): Promise<OpenAiInputFile[]> {
   }
 
   const files = [
-    { url: '/knowledge/Automater7.pdf', filename: 'Automater7.pdf' },
-    { url: '/knowledge/Korplan8.pdf', filename: 'Korplan8.pdf' },
+    { url: withBase('knowledge/Automater7.pdf'), filename: 'Automater7.pdf' },
+    { url: withBase('knowledge/Korplan8.pdf'), filename: 'Korplan8.pdf' },
   ]
 
   const loaded = await Promise.all(files.map((file) => fetchPdfAsInputFile(file.url, file.filename)))
@@ -222,7 +224,7 @@ async function fetchPdfAsInputFile(url: string, filename: string): Promise<OpenA
   return {
     type: 'input_file',
     filename,
-    file_data: `data:application/pdf;base64,${fileData}`,
+    file_data: fileData,
   }
 }
 
@@ -249,4 +251,11 @@ function blobToDataUrl(blob: Blob): Promise<string> {
     reader.onerror = () => reject(new Error('Fel vid läsning av PDF-blob.'))
     reader.readAsDataURL(blob)
   })
+}
+
+function withBase(path: string): string {
+  const base = import.meta.env.BASE_URL || '/'
+  const normalizedBase = base.endsWith('/') ? base : `${base}/`
+  const normalizedPath = path.replace(/^\//, '')
+  return `${normalizedBase}${normalizedPath}`
 }
