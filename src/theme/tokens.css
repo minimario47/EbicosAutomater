@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --ink: #000000;
+  --paper: #ffffff;
+  --line-thick: 3px;
+  --line-base: 2px;
+  --line-thin: 1px;
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --font-display: 'Archivo', 'Helvetica Neue', sans-serif;
+  --font-code: 'IBM Plex Mono', 'SFMono-Regular', monospace;
+}
