@@ -16,7 +16,19 @@ interface KnowledgeChunk {
   terms: string[]
 }
 
+interface MandatorySnippet {
+  key: string
+  text: string
+  terms: string[]
+}
+
+interface LoadedSource {
+  sourceId: string
+  text: string
+}
+
 let chunksCache: KnowledgeChunk[] | null = null
+let mandatoryCache: MandatorySnippet[] | null = null
 
 export async function ensureEbicosKnowledge(): Promise<void> {
   await loadChunks()
@@ -24,10 +36,11 @@ export async function ensureEbicosKnowledge(): Promise<void> {
 
 export async function retrieveEbicosContext(query: string, maxChunks = 8): Promise<string[]> {
   const chunks = await loadChunks()
+  const mandatory = pickMandatorySnippets(query)
   const terms = normalize(query)
 
   if (!terms.length) {
-    return chunks.slice(0, maxChunks).map((chunk) => chunk.text)
+    return [...mandatory.map((item) => item.text), ...chunks.slice(0, maxChunks).map((chunk) => chunk.text)]
   }
 
   const ranked = chunks
@@ -37,13 +50,27 @@ export async function retrieveEbicosContext(query: string, maxChunks = 8): Promi
     }))
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, maxChunks)
+    .slice(0, maxChunks + mandatory.length * 2)
 
   if (!ranked.length) {
-    return chunks.slice(0, maxChunks).map((chunk) => chunk.text)
+    return [...mandatory.map((item) => item.text), ...chunks.slice(0, maxChunks).map((chunk) => chunk.text)]
   }
 
-  return ranked.map((item) => item.chunk.text)
+  const selected = mandatory.map((item) => item.text)
+  const seen = new Set(selected)
+
+  for (const item of ranked) {
+    if (seen.has(item.chunk.text)) {
+      continue
+    }
+    selected.push(item.chunk.text)
+    seen.add(item.chunk.text)
+    if (selected.length >= maxChunks + mandatory.length) {
+      break
+    }
+  }
+
+  return selected
 }
 
 async function loadChunks(): Promise<KnowledgeChunk[]> {
@@ -51,7 +78,7 @@ async function loadChunks(): Promise<KnowledgeChunk[]> {
     return chunksCache
   }
 
-  const loaded = await Promise.all(
+  const loadedSources = await Promise.all(
     KNOWLEDGE_SOURCES.map(async (source) => {
       const response = await fetch(source.path)
       if (!response.ok) {
@@ -59,12 +86,13 @@ async function loadChunks(): Promise<KnowledgeChunk[]> {
       }
       return {
         sourceId: source.id,
-        text: await response.text(),
+        text: cleanSource(await response.text()),
       }
     }),
   )
 
-  chunksCache = loaded.flatMap((source) => chunkText(source.text, source.sourceId))
+  mandatoryCache = buildMandatorySnippets(loadedSources)
+  chunksCache = loadedSources.flatMap((source) => chunkText(source.text, source.sourceId))
   return chunksCache
 }
 
@@ -118,6 +146,90 @@ function chunkText(source: string, sourceId: string): KnowledgeChunk[] {
   }
 
   return chunks.filter((chunk) => chunk.text.length > 40)
+}
+
+function pickMandatorySnippets(query: string): MandatorySnippet[] {
+  const all = mandatoryCache ?? []
+  if (!all.length) {
+    return []
+  }
+  void query
+  return all
+}
+
+function buildMandatorySnippets(sources: LoadedSource[]): MandatorySnippet[] {
+  const snippets: MandatorySnippet[] = []
+
+  const automater = sources.find((source) => source.sourceId === 'AUTOMATER7')?.text
+  const korplan = sources.find((source) => source.sourceId === 'KORPLAN8')?.text
+
+  if (automater) {
+    pushMandatory(snippets, 'AUTOMATER7-7.6', extractBetween(automater, /7\.6\s+Automatinnehåll/i, /7\.7\s+Exekvering/i))
+    pushMandatory(snippets, 'AUTOMATER7-7.9', extractBetween(automater, /7\.9\s+Sammanställning av kommandon/i, /8\.\s+Körplaner/i))
+  }
+
+  if (korplan) {
+    pushMandatory(
+      snippets,
+      'KORPLAN8-8.3',
+      extractBetween(korplan, /8\.3\s+Körplanens uppbyggnad och struktur/i, /8\.4\s+Process för arbete med körplaner/i),
+    )
+    pushMandatory(snippets, 'KORPLAN8-8.14', extractBetween(korplan, /8\.14\s+Sammanställning av kommandon/i))
+  }
+
+  return snippets
+}
+
+function pushMandatory(target: MandatorySnippet[], key: string, rawText: string): void {
+  const text = clampText(rawText, 4200)
+  if (!text) {
+    return
+  }
+
+  target.push({
+    key,
+    text: `[${key}] ${text}`,
+    terms: normalize(text),
+  })
+}
+
+function extractBetween(source: string, startPattern: RegExp, endPattern?: RegExp): string {
+  const startMatch = startPattern.exec(source)
+  if (!startMatch || startMatch.index < 0) {
+    return ''
+  }
+
+  const start = startMatch.index
+  const tail = source.slice(start)
+
+  if (!endPattern) {
+    return shrinkChunk(tail)
+  }
+
+  const endMatch = endPattern.exec(tail)
+  if (!endMatch || endMatch.index < 0) {
+    return shrinkChunk(tail)
+  }
+
+  const end = endMatch.index
+  return shrinkChunk(tail.slice(0, end))
+}
+
+function clampText(text: string, maxChars: number): string {
+  if (!text) {
+    return ''
+  }
+  if (text.length <= maxChars) {
+    return text
+  }
+  return `${text.slice(0, maxChars)} ...`
+}
+
+function cleanSource(text: string): string {
+  return text
+    .replace(/\r/g, '')
+    .replace(/Dokumentet är elektroniskt undertecknat/gi, '')
+    .replace(/strictly prohibited\./gi, '')
 }
 
 function shrinkChunk(text: string): string {
