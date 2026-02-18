@@ -224,7 +224,7 @@ async function fetchPdfAsInputFile(url: string, filename: string): Promise<OpenA
   return {
     type: 'input_file',
     filename,
-    file_data: fileData,
+    file_data: `data:application/pdf;base64,${fileData}`,
   }
 }
 
