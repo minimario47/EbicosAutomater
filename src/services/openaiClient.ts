@@ -10,6 +10,14 @@ interface OpenAiResponse {
   }>
 }
 
+interface OpenAiInputFile {
+  type: 'input_file'
+  filename: string
+  file_data: string
+}
+
+let pdfInputCache: OpenAiInputFile[] | null = null
+
 export async function runEbicosAssistant(
   request: RunRequest,
   validationIssues: ValidationIssue[],
@@ -17,6 +25,7 @@ export async function runEbicosAssistant(
 ): Promise<AiResult> {
   const systemPrompt = buildSystemPrompt(request.mode, contextSnippets)
   const userPrompt = buildUserPrompt(request, validationIssues)
+  const pdfInputs = await loadObligatoryPdfInputs()
 
   const response = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST',
@@ -33,7 +42,7 @@ export async function runEbicosAssistant(
         },
         {
           role: 'user',
-          content: [{ type: 'input_text', text: userPrompt }],
+          content: [...pdfInputs, { type: 'input_text', text: userPrompt }],
         },
       ],
     }),
@@ -185,4 +194,59 @@ function tryExtractJson(text: string): string | null {
   }
 
   return null
+}
+
+async function loadObligatoryPdfInputs(): Promise<OpenAiInputFile[]> {
+  if (pdfInputCache) {
+    return pdfInputCache
+  }
+
+  const files = [
+    { url: '/knowledge/Automater7.pdf', filename: 'Automater7.pdf' },
+    { url: '/knowledge/Korplan8.pdf', filename: 'Korplan8.pdf' },
+  ]
+
+  const loaded = await Promise.all(files.map((file) => fetchPdfAsInputFile(file.url, file.filename)))
+  pdfInputCache = loaded
+  return loaded
+}
+
+async function fetchPdfAsInputFile(url: string, filename: string): Promise<OpenAiInputFile> {
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Obligatorisk PDF saknas eller kunde inte läsas: ${filename}`)
+  }
+
+  const buffer = await response.arrayBuffer()
+  const fileData = await arrayBufferToBase64(buffer)
+  return {
+    type: 'input_file',
+    filename,
+    file_data: fileData,
+  }
+}
+
+async function arrayBufferToBase64(buffer: ArrayBuffer): Promise<string> {
+  const blob = new Blob([buffer], { type: 'application/pdf' })
+  const dataUrl = await blobToDataUrl(blob)
+  const base64 = dataUrl.split(',')[1] ?? ''
+  if (!base64) {
+    throw new Error('Kunde inte koda PDF till base64.')
+  }
+  return base64
+}
+
+function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result)
+        return
+      }
+      reject(new Error('Kunde inte läsa PDF-blob.'))
+    }
+    reader.onerror = () => reject(new Error('Fel vid läsning av PDF-blob.'))
+    reader.readAsDataURL(blob)
+  })
 }
