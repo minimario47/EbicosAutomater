@@ -17,15 +17,15 @@ interface InputPanelProps {
 }
 
 const modeTitle: Record<AutomationMode, string> = {
-  create: 'NEW',
-  edit: 'PATCH',
-  debug: 'TRACE',
+  create: 'SKAPA',
+  edit: 'REDIGERA',
+  debug: 'FELSÖK',
 }
 
 const modePlaceholder: Record<AutomationMode, string> = {
   create: 'START 327\n...\nSLUT',
-  edit: 'Paste existing automation',
-  debug: 'Paste failing automation',
+  edit: 'Klistra in befintlig automat',
+  debug: 'Klistra in automat med fel',
 }
 
 export function InputPanel({
@@ -44,16 +44,16 @@ export function InputPanel({
   onRun,
 }: InputPanelProps) {
   return (
-    <section className="input-panel" aria-label="Input">
+    <section className="input-panel" aria-label="Inmatning">
       <div className="panel-head">
         <h2>{modeTitle[mode]}</h2>
         <button type="button" className="run-button" onClick={onRun} disabled={isRunning}>
-          {isRunning ? 'RUNNING' : 'RUN'}
+          {isRunning ? 'KÖR...' : 'KÖR'}
         </button>
       </div>
 
       <label className="field-label" htmlFor="source-code">
-        CODE
+        KOD
       </label>
       <textarea
         id="source-code"
@@ -65,32 +65,32 @@ export function InputPanel({
       />
 
       <label className="field-label" htmlFor="intent-text">
-        INTENT
+        AVSIKT
       </label>
       <textarea
         id="intent-text"
         className="intent-input"
         value={intent}
         onChange={(event) => onIntentChange(event.target.value)}
-        placeholder="ATB 327 with safe stop condition"
+        placeholder="ATB 327 med säker stoppsekvens"
         spellCheck={false}
       />
 
       <label className="field-label" htmlFor="notes-text">
-        NOTES
+        NOTERING
       </label>
       <input
         id="notes-text"
         className="single-input"
         value={notes}
         onChange={(event) => onNotesChange(event.target.value)}
-        placeholder="Optional operator context"
+        placeholder="Valfri operatörskontext"
       />
 
       <div className="credential-grid">
         <div>
           <label className="field-label" htmlFor="model-name">
-            MODEL
+            MODELL
           </label>
           <input
             id="model-name"
@@ -103,7 +103,7 @@ export function InputPanel({
 
         <div>
           <label className="field-label" htmlFor="api-key">
-            KEY
+            NYCKEL
           </label>
           <input
             id="api-key"

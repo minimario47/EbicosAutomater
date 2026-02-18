@@ -1,0 +1,1938 @@
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+ Kommando                                   Betydelse
+ QSF spårledning                            Spårledning fri
+ QSP spårledning                            Spårledning spärrad
+ QES spårledning                            Spårledning ej spärrad
+
+ QVH växel                                  Växel höger
+ QVV växel                                  Växel vänster
+ QVL växel                                  Växel/spårspärr lokalfrigiven
+ QVE växel                                  Växel/spårspärr ej lokalfrigiven
+ QDN geonod                                 Ej tillgänglig GEO-nod
+ QLN geonod                                 Tillgänglig GEO-nod
+
+ EXT signal tågnummer                       Tågnummer vid signal
+ EXF signal tågnummer                       Tågnummer ej vid signal
+
+ EXN signal tågnummer                       Tågnummer i jämförelse sats
+ EXM tågnummer mod                          Tågets driftform (FS, OS, SR, SB) endast ERTMS fordon.
+ EXP tågnummer position                     Tågets position enligt: Avstånd i meter fram till framförvarande
+                                            signalpunkt. Avstånd används vid ”lika med”, ”större än” och
+                                            ”mindre än” jämförelsesatser. Gäller endast ERTMS fordon.
+ EXH tågnummer hastighet                    Tågets hastighet i km/m, endast ERTMS fordon
+ EXL tågnummer längd                        Tågets längd i meter (m), endast ERTMS fordon
+
+ VTN signal $train                          Hämta tågnummer ”$train” vid angiven signal
+ VTS tågnummer $speed                       Hämta tågets ”$speed” aktuella hastighet
+ VTM tågnummer $mode                        Hämta tågets ”$mode” aktuella driftform
+ VTL tågnummer $length                      Hämta tågets ”$length” längd
+ VTP tågnummer $position                    Hämta tågets ”$position” aktuella position. Som utrycks i meter till
+                                            framförvarande signal.
+
+7.9.6       Hopp
+ Kommando                                   Betydelse
+ ATN läge                                   Lägesnamn (Exakt fem tecken, 0-9 & A-Z)
+ HOP läge                                   Hopp till lägesnamn (Exakt fem tecken, 0-9 & A-Z)
+
+7.9.7       Övrigt
+ --                                         Avgränsningstecken för kommentartext. All text till höger
+                                            om dessa på aktuella rad ignoreras av kompilatorn.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          325(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.          Körplaner
+8.1         Om körplaner och automatisk tågledning
+Tågledningsfunktionen (TLS) är en del av EBICOS 900 kretslopp för fjärrstyrning. Dess uppgift är att
+avlasta operatören genom att bl.a. automatiskt ställa tågvägar. Detta utförs med hjälp av körplaner.
+För varje tåg finns en körplan med samma nummer som tåget. Körplanen innehåller kommandon för
+tågets styrning. Med hjälp av logiska satser kan val göras mellan olika kommandon. Vilket val som görs
+beror på om villkor är uppfyllda eller ej. Vägsökningsfunktionen (COS) svarar om kommandon kan utföras
+eller inte.
+
+Även om en körplan exekveras kan man fortfarande ställa väg manuellt. Om den manuella vägen hinner
+ställas innan TLS ställer väg enligt körplanen fortsätter tåget enligt den manuellt ställda vägen.
+Tågnummerkommandon exekveras dock enligt körplan som vanligt.
+
+En körplan är inte begränsad till ett geografiområde utan gäller över hela trafikområdet. Redigering av
+körplaner är inte beroende av behörighetsområden.
+
+Se även avsnitt 2.2 Fjärrstyrningens kretslopp.
+
+8.2         Permanenta och tillfälliga körplaner
+Det finns permanenta och tillfälliga körplaner. Existerar både en tillfällig och en permanent körplan med
+samma nummer, kommer den tillfälliga körplanen att aktiveras vid inmatning av tågnumret.
+
+8.2.1       Permanenta körplaner
+I ett EBICOS 900 med fullt integrerad tågledning ska varje tåg associeras med en körplan som innehåller
+styrning för tågets tänkta väg. När ett tågnummer introduceras i EBICOS 900 förväntar sig systemet att
+en motsvarande körplan finns, och normalt kommer den då att direkt börja exekveras.
+Alltså måste man före driftsättning av ett EBICOS 900 med integrerad tågledning ägna tid åt att tänka
+igenom hur den totala trafiksituationen ser ut inom det aktuella trafikområdet för att sedan skapa en
+struktur där alla planerade tågrörelser beaktas. Därefter måste man överföra och översätta denna struktur
+till en uppsättning körplaner som är exekverbara av EBICOS 900. Detta kan bli ett omfattande arbete som
+kräver god tågdriftserfarenhet. Komplexiteten i körplanerna bestäms egentligen mest av hur många
+speciella situationer man vill kunna hantera automatiskt. Det man inte tar i beräkning på förhand, det får
+operatörerna ta igen i form av manuella ingrepp under själva driften.
+De körplaner som i det här läget skapas är permanenta körplaner. Arbetet kan utföras offline, d.v.s. vid en
+separat arbetsstation som ej nödvändigtvis är uppkopplad mot EBICOS 900.
+
+Permanenta körplaner kan inte skapas eller raderas av en operatör. Däremot kan körplanens innehåll
+redigeras.
+
+Läs om hur man skapar och aktiverar permanenta körplaner i avsnitt 8.9 Arbeta med permanenta
+körplaner.
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          326(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.2.2       Tillfälliga körplaner
+När den grundläggande uppsättningen permanenta körplaner finns på plats i systemet kommer
+tågledningen i EBICOS 900 fungera helt automatiskt, men bara så länge trafiken flyter enligt det
+planerade mönstret. Om däremot tillfälliga tågrörelser uppkommer, eller om situationer på banan gör att
+trafiken måste framföras på ett sätt som ej förutsetts i körplanerna, då uppstår behov av att tillfälligt
+ändra tågledningen. I det här läget har operatören möjlighet att skapa så kallade tillfälliga körplaner.
+En tillfällig körplan raderas enligt följande:
+      •    Efter att ha aktiverats vid introduktion av tillhörande tågnummer, kommer körplanen att
+           raderas automatiskt, när dess tågnummer raderas.
+      •    Körplanen raderas automatiskt om den inte har aktiverats inom ett dygn.
+      •    Körplanen kan raderas manuellt.
+Läs om hur man skapar och aktiverar tillfälliga körplaner i avsnitt 8.8 Arbeta med tillfälliga körplaner.
+Den aktiva TLS-volymen kan även visas i ett fält på arbetsplatsens övre eller nedre
+informationspanel. Se även avsnitt 8.7.2.4 Visning av aktiv TLS-volym på informationspanel.
+
+8.3         Körplanens uppbyggnad och struktur
+8.3.1       Allmänt
+En körplan innehåller alltid ett huvud och en vägplan.
+      •    Huvudet innehåller körplanens identitet (tågnummer), introduktionstid, och sträckans
+           start- respektive slutpunkt.
+      •    Vägplanen innehåller själva tågledningen, d.v.s. tågvägskommandon för tåget utmed den
+           planerade sträckan baserat på logiska satser och villkor.
+Kommentarer är tillåtna i källkodsfilen. Dessa ska då ligga till höger om satserna och föregås av två
+bindestreck.
+
+8.3.2       Huvud
+
+8.3.2.1     Startmarkör
+Huvudet inleds med en startmarkör, följt av det aktuella tågnumret enligt formatet:
+START_tågnummer
+
+Tågnumret utgör körplanens identitet och är hårt kopplat till det tåg som ska ledas.
+
+8.3.2.2     Introduktionstid
+Den i körplanen definierade introduktionstiden är avgörande för om den ska aktiveras eller inte. Stämmer
+inte denna med tidpunkten för motsvarande tågnummers inmatande aktiveras inte körplanen och ett
+funktionslarm genereras.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          327(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Introduktionstiden definieras genom kombination av en tidsangivelse i huvudet och de dagkoder som
+angivits i den första DGN-satsen i själva vägplanen. Tidsangivelsen i huvudet definieras enligt följande
+format:
+INTIME = timmar:minuter
+
+Tidpunkten för ett tågnummers inmatning anses stämma med introduktionstiden om den infaller inom
+tidsintervallet: 8 timmar före till 16 timmar efter angiven introduktionstid, oavsett om detta innebär att en
+dygnsgräns passeras framåt eller bakåt.
+Exempel
+Om dygnskoden ON ingår i DGN-satsen och introduktionstiden är satt till 23.00 så gäller för följande
+tidpunkter:
+ON      01.00           falskt
+TO      01.00           sant
+
+8.3.2.3     Introduktions- och destinationssignal
+I huvudet anges introduktions- och destinationssignalerna för den sträcka som det aktuella tåget ska ledas
+med körplanen. Introduktions- och destinationssignalerna är bara information men måste vara korrekta
+signaler i systemet.
+Formatet för introduktionssignalen:
+INTRSIG = signalobjekt
+
+Formatet för destinationssignalen:
+DESSIG = signalobjekt
+
+8.3.2.4     Tilläggsnummer
+Tilläggsnumret är en informativ textsträng. Det visas efter tågnumret vid tågnummerförfrågningar,
+tåglägeslistor m.m. Strängen kan utelämnas.
+Formatet är:
+TRINF = text
+
+8.3.3       Vägplan
+Vägplanen innehåller de åtgärder som ska vidtas vid respektive signal. Vägplanen inleds med en
+startmarkör:
+RPS (filnamn.std;)
+
+Parametern filnamn.std är namnet på en eventuell standardfil som ska inkluderas av kompilatorn.
+Parametern kan utelämnas. Mer om detta beskrivs i avsnitt 8.9.5 Bygga körplaner utifrån standardplaner.
+
+8.3.3.1     Huvudposter
+En huvudpost anger för vilka typer av dagar samt vid vilka signaler därpå följande åtgärder gäller.
+Observera att med dag menas här den introduktionsdag som gällde vid körplanens aktivering.
+
+
+
+2024-09-06                     1553 - JPC 202 900              17.9.0.0             DRAFT                          328(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Huvudposter:
+ DGN           Dygnsposten anger för vilka typer av dagar nästföljande åtgärder ska utföras. Posten gäller
+               till nästkommande dygnspost.
+ STN           Stationsposten används för att gruppera signalposterna under en dygnspost. Posten är till för
+               att underlätta läsningen av körplanen och kan utelämnas.
+ SIG           Signalposten anger för vilken signal nästföljande åtgärder ska utföras. Om samma åtgärder
+               ska utföras för olika signaler, kan dessa signalposter skrivas efter varandra och därefter de
+               gemensamma åtgärderna. Dock måste signalerna vara parallella, d.v.s. tåget får inte passera
+               mer än en av signalerna under en och samma aktivering.
+En vägplan måste börja med en dygnspost vilket även är minimum för dess innehåll.
+Om en körplan exekveras vid en signal som inte behandlas i körplanen, kommer normalväg att begäras
+från signalen. Normalväg beskrivs i samband med kommandot för normalväg.
+
+8.3.3.2     Kommandon
+De kommandon som förekommer i en vägplan kan grupperas enligt nedan.
+      •    vägställning
+      •    tågnummer
+      •    stopp
+
+8.3.3.2.1 Vägställning
+Tågledningsfunktionen undersöker huruvida rörelsevägar kan ställas eller ej. Order köas inte utan i stället
+undersöks med jämna mellanrum möjligheten att ställa vägar.
+De vägställningskommandon som ges behandlas sedan av den normala förprövningsfunktionen i
+EBICOS 900.
+Tåg- eller växlingsväg
+Eftersom startpunkten är given krävs endast slutpunkt och eventuella viapunkter som parametrar vid
+begäran av tåg- eller växlingsväg.
+Kommandon:
+      •    HTR_signal...: tågväg begärs till angiven signal via eventuellt angivna signaler.
+      •    KVR_signal...: växlingsväg begärs till angiven signal via eventuellt angivna signaler.
+Alternativvägar
+Alternativvägar kan begäras efter en begäran av tåg- eller växlingsväg. Om den begärda rörelsevägen ej
+kan ställas på grund av ett annat tåg med samma riktning, kommer vägen att omprövas med jämna
+mellanrum. Om den vägen ej kan ställas på grund av något annat hinder, undersöks en eventuell
+alternativväg. Typ av väg bestäms av den rörelseväg den är alternativ till.
+Kommando:
+      •    ALT_signal...: alternativ rörelseväg begärs till angiven signal via eventuellt angivna
+           signaler.
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          329(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Normalväg
+Vid begäran av normalväg anges inga parametrar. Tågledningsfunktionen söker automatiskt väg beroende
+på växlars prioriterade lägen samt olika hinder. Val av vägtyp beror på vilken av nedanstående principer,
+som är bestämd för anläggningen.
+      •    Tågväg.
+      •    Växlingsväg.
+      •    Val av vägtyp är beroende av börjanpunkten. Tågväg väljs om sådan är tillåten, annars väljs
+           växlingsväg.
+Kommando:
+      •    NRM: normalväg begärs
+
+8.3.3.2.2 Tågnummer
+Radering av tågnummer och byte av tågnummer
+Radering av tågnummer och byte av tågnummer innebär att den aktuella körplanen kommer att bli passiv
+efter kommandots utförande. Av den anledningen utförs kommandot inte vid läggningsavståndet utan
+först när tåget når fram till signalen. Inga ytterligare åtgärder kommer heller att utföras i körplanen.
+Kommandon:
+      •    TRN: det egna tågnumret raderas.
+      •    TBN_tågnummer: det egna tågnumret byts mot angivet.
+Vändning av tågnummers rörelseriktning
+Vändning av tågnummers rörelseriktning utförs inte vid läggningsavståndet utan först när tåget når fram
+till signalen.
+Kommando:
+      •    TVN: det egna tågnumrets rörelseriktning vänds.
+Tågnummerinmatning
+Tågnummerinmatning påverkar inte det egna tåget och kan därför utföras redan vid läggningsavståndet.
+Kommando:
+      •    TDN_signal_tågnummer: angivet tågnummer matas in vid angiven signal.
+
+8.3.3.2.3 Stopp
+Stopp används när körplanen lämnar ifrån sig ledningen av tåget. Normalväg ställs således ej utan tåget
+måste nu manövreras manuellt eller av en automat. Exekveringen av körplanen fortsätter när tåget
+närmar sig en signal som är tillslagen för automatisk tågledning.
+Kommando:
+      •    STO: den automatiska tågledningen stoppas tillfälligt.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          330(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.3.3.3      Logiska satser
+För att möjliggöra villkorlig kommandogivning finns två logiska satser. De inleds med en huvudpost som
+anger vilken sats det är och avslutas med en slutpost.
+Huvudposterna är:
+      •     VAN: vänta tills villkor sant
+      •     NAR: när villkor sant, ge kommando annars vänta
+Slutposten är:
+      •     SLT: gemensam slutpost
+Sekvenser:
+      •     En villkorssekvens (vs) består av ett eller fler villkor efter varandra, antalet villkor är ej
+            begränsat.
+      •     En kommandosekvens (ks) består av ett eller flera kommandon efter varandra, antalet
+            kommandon är ej begränsat.
+I logiska satser gäller:
+      •     En vs är sann när samtliga villkor i sekvensen är sanna samtidigt. Om kravet är att villkoren
+            ska vara uppfyllda i en viss ordning måste de placeras i olika satser efter varandra.
+      •     Logiska satser får ej nästlas.
+      •     En logisk sats har korrekt syntax först då satsen innehåller huvudpost, slutpost och
+            minimalt antal delposter.
+De kommandon och villkor, som används i exemplen senare i kapitlet, finns listade i avsnitt
+8.14 Sammanställning av kommandon.
+
+8.3.3.3.1 VAN-satsen
+Ingående poster
+VAN huvudpost
+SLT       slutpost
+Syntax
+VAN vs
+SLT
+Funktion
+Är villkorssekvensen sann fortsätter exekveringen omedelbart efter SLT. Om den är falsk, kommer
+exekveringen att hejdas. När villkorssekvensen blir sann, fortsätter exekveringen efter SLT.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          331(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel VAN
+VAN vs     -sann                                                 VAN QAT 00:10
+SLT                                                              SLT
+Exekveringen fortsätter.
+VAN v1          -sann                                            VAN QAT 17:00
+    v2          -falsk                                           PVS
+SLT                                                              SLT
+Exekveringen hejdas, när v2 blir sann kontrolleras v1 och v2 på nytt och om båda är sanna fortsätter
+exekveringen, annars fortsätter väntan.
+
+8.3.3.3.2 NAR-satsen
+Ingående poster
+NAR huvudpost
+DAA markerar början på en villkorssekvens
+UTF markerar början på en kommandosekvens
+SLT     slutpost
+Syntax
+ NAR
+ DAA vs1
+ UTF ks1
+(DAA vs2)
+(UTF ks2)
+( - )
+( - )
+ SLT
+Delarna inom parentes är valfria. Satsen måste innehålla NAR-DAA-vs-UTF-ks-SLT. Antalet DAA-vs-UTF-
+ks par är ej begränsat.
+Funktion
+Villkorssekvenserna undersöks uppifrån och ner. Om en villkorssekvens är sann utförs motsvarande
+kommandosekvens varefter exekveringen fortsätter efter SLT. Om ingen villkorssekvens är sann hejdas
+exekveringen. Proceduren upprepas tills en sann villkorssekvens påträffas.
+Exempel NAR
+NAR                                      NAR
+DAA vs          -falsk                   DAA QAT 12:00
+UTF ks                                   UTF HTR S19 067
+SLT                                      SLT
+Exekveringen hejdas tills dess hela vs är sann, varefter ks utförs och exekveringen fortsätter efter SLT.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          332(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+NAR                                      NAR
+DAA vs1         -falsk                   DAA QAT 12:00
+UTF ks1                                  UTF HTR S19 063
+DAA vs2         -sann                    DAA PVS
+UTF ks2                                  UTF HTR S19 061
+SLT                                      SLT
+ks2 utförs och exekveringen fortsätter efter SLT.
+NAR                                      NAR
+DAA vs1         -falsk                   DAA QAT 12:00
+UTF ks1                                  UTF HTR S19 063
+DAA vs2         -falsk                   DAA PVS
+UTF ks2                                  UTF HTR S19 061
+SLT                                      SLT
+exekveringen hejdas, om vs1 blir sann först utförs ks1, om vs2 ks2, och exekveringen fortsätter efter SLT.
+
+8.3.3.4     Villkor
+
+8.3.3.4.1 Tidsberoende
+Villkoret är beroende av en absolut tidpunkt.
+QAT_timmar:minuter              Angiven tidpunkt har passerats. Villkoret måste placeras först i en eventuell
+                                villkorssekvens.
+PEA_timmar:minuter              Angiven tidpunkt har inte passerats. Villkoret får ej användas i VAN-satser.
+En tidpunkt anses vara passerad från och med tidpunkten och ytterligare 16 timmar. Resterande 8 av
+dygnets 24 timmar anses tidpunkten ej vara passerad.
+
+8.3.3.4.2 Positionsberoende
+Villkoret är beroende av var tåg (eller tågnummer) befinner sig.
+Uttrycket uppehåller sig vid en signal innebär att tåget belägger spårledningen omedelbart framför
+signalen.
+Innebörden av uttrycket befinner sig mellan två signaler är anläggningsberoende. Antingen så räcker det
+att tågnumret finns i något av tågnummermagasinen mellan signalerna eller så måste spårledningen vid
+magasinet även vara belagd. Observera att tågnumret ska ha samma riktning som signalerna samt att
+sökvägen mellan signalerna går enligt mellanliggande växlars prioriterade lägen.
+Observera att det med jokertecken(+) är möjligt att ange en grupp tågnummer i ett villkor. Exempel på
+tågnummer som matchar 0012++ är 001234, 001244, 001245 och 001299.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          333(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+PVS_(sekunder)                           Det egna tåget har uppehållit sig vid aktuell signal mer än T sekunder.
+                                         Tiden T är anläggningsberoende. Om den valfria parametern sekunder
+                                         anges ersätter den T.
+PVT_signal_tågnummer                     Angivet tåg har uppehållit sig vid angiven signal mer än T sekunder.
+                                         Tiden T är anläggningsberoende.
+PTF_signal_ signal_tågnummer
+      (signal…)         Angivet tåg befinner sig mellan de två angivna signalerna eller uppehåller sig vid
+                        någon av, på nästa rad, angivna signaler.
+PTE_signal_signal_tågnummer
+      (signal…)         Angivet tåg befinner sig ej mellan de två angivna signalerna. Ej heller uppehåller sig
+                        tåget vid någon av, på nästa rad, angivna signaler.
+
+8.3.4       Exempel 1
+Normal situation för pendeltåg på sträckan Rönninge - Märsta. Enligt huvudet gäller körplanen för
+tåg 2780 och färdsträckan är mellan signal 22 i Rönninge och signal 84 i Märsta. Introduktionstiden är
+8:12. De dagar som körplanen gäller för är också angivna.
+VKP-VISNING AV KÖRPLAN 002780 MO TI ON TO FR LO SO S1
+IS: RON 022 MAR 084 IT: 08 12 S2 S3 S4 S5 S6 S7 S8 S9
+-------------------------------------------------
+DGN MO TI ON TO FR LO SO S1   -- För följande dygn gäller
+STN S23 RÖNNINGE              -- På station Rönninge att
+ SIG S23 022                  -- vid signal 22
+  HTR S23 032                 -- ställ väg till signal 32
+  ALT S23 062                 -- eller till signal 62.
+STN S19 TUMBA                 -- På station Tumba att
+ SIG S19 022                  -- vid signal 22
+  HTR S19 032                 -- ställ väg till signal 32
+  ALT S19 094                 -- eller till signal 94
+  ALT S19 092                 -- eller till signal 92.
+STN S14 HUDDINGE              -- På station Huddinge att
+ SIG S14 022                  -- vid signal 22
+  HTR S14 032                 -- ställ väg till signal 32
+  ALT S14 062                 -- eller till signal 62.
+STN N11 SOLLENTUNA            -- På station Sollentuna
+ SIG N11 022                  -- vid signal 22
+  HTR N11 032                 -- ställ väg till signal 32
+  ALT N11 062                 -- eller till signal 62.
+ SIG N11 032                  -- vid signal 32
+  VAN PVS                     -- vänta till tåget stannar
+  SLT
+  HTR N11 092                 -- lägg väg till signal 92.
+STN N13 VÄDERHOLMEN           -- På station Väderholmen
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          334(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+  SIG N13 022                                        -- vid signal 22
+   VAN PVS                                           -- vänta till tåget stannat
+  SLT
+  HTR N13 022                                        -- ställ väg till signal 22
+STN N15 ROTEBRO                                      -- På station Rotebro
+ SIG N15 022                                         -- vid signal 22
+  HTR N15 32                                         -- lägg väg till signal 32
+  ALT N15 62                                         -- eller till signal 62
+ SIG N15 32                                          -- och vid signal 32
+  VAN PVS                                            -- vänta till tåget stannat
+  SLT
+
+  HTR N15 092                 -- lägg väg till signal 92.
+STN N17 UPPLANDS-VÄSBY        -- På stn Upplands-Väsby
+ SIG N17 022                  -- vid signal 22
+  HTR N17 032                 -- lägg väg till signal 32
+  ALT N17 084                 -- eller till signal 84
+  ALT N17 082                 -- eller till signal 82
+ SIG N17 032                  -- och vid signal 32
+  VAN PVS                     -- vänta till tåget stannat
+  SLT
+  HTR N17 092                 -- lägg väg till signal 92.
+STN N21 ROSERSBERG            -- På station Rosersberg
+ SIG N21 022                  -- vid signal 22
+  HTR N21 032                 -- lägg väg till signal 32
+  ALT N21 062                 -- eller till signal 62
+ SIG N21 032                  -- och vid signal 32
+  VAN PVS                     -- vänta till tåget stannat
+  SLT
+  HTR N21 092                 -- lägg väg till signal 92.
+DGN MO TI ON TO FR            -- För följande dygn gäller
+STN N24 MÄRSTA                -- på station Märsta
+ SIG N24 084                  -- vid signal 84
+  TBN 002703                  -- byt tågnummer till 002703
+DGN LO SO                     -- För följande dygn gäller
+ SIG N24 022                  -- vid signal 22 (i Märsta)
+  HTR N24 094                 -- lägg väg till signal 94
+ SIG N24 094                  -- och vid signal 94
+  TBN 002703                  -- byt tågnummer till 002703
+-------------------------------------------------
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          335(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.3.5       Exempel 2
+En situation som utnyttjar de avancerade faciliteterna i EBICOS 900. Detta exempel inkluderar bara tre
+stationer.
+VKP-VISNING AV KÖRPLAN 001102 MO TI ON TO FR LO SO S1
+IS: MAR 083 STJ 085 IT: 08 12 S2 S3 S4 S5 S6 S7 S8 S9
+-------------------------------------------------
+DGN MO TI ON TO FR                    -- För följande dygn gäller
+STN N24 MÄRSTA                        -- På station Märsta att
+ SIG N24 083                          -- vid signal 24
+  NAR
+   DAA QAT 13.02                      -- när kl blivit 13:02
+     PTE N26 021 N24 031 000675       -- och tåg 675 inte är mellan dessa signaler
+     PTE N22 022 N24 022 005106       -- och tåg 5106 inte är mellan dessa signaler
+   UTF HTR N24 021                    -- ställ väg till S21.
+   DAA QAT 13.02                      -- när kl blivit 13:02
+     PTE N19 042 N24 022 005106       -- och tåg 5106 ej är mellan dessa signaler
+     PTF N25 021 N24 031 000675       -- men tåg 675 är mellan dessa signaler
+   UTF HTR N24 071                    -- lägg väg till signal 71.
+ SLT
+DGN LO                                -- För följande dygn gäller
+ SIG N24 083                          -- vid signal 83
+  VAN QAT 13.02                       -- vänta till kl 13:02 och
+   PTE N22 022 N24 022 005194         -- tåg 5194 ej är mellan dessa signaler
+  SLT
+  HTR N24 021                         -- lägg väg till signal 21.
+DGN SO S1                             -- För följande dygn gäller
+ SIG N24 083                          -- vid signal 83
+  VAN QAT 13.02                       -- vänta till kl. 13:02
+ SLT
+ HTR N24 021                          -- lägg väg till signal 21.
+DGN MO TI ON TO FR                    -- För följande dygn gäller
+STN N22 NORSLUNDA                     -- På station Norslunda
+ SIG N22 051                          -- vid signal 51
+  NAR                                 -- när då
+   DAA PTF N22 021 N20 021 000675     -- tåg 675 är mellan dessa signaler
+   UTF HTR N22 041                    -- lägg väg till signal 41,
+   DAA PTE N17 042 N22 042 005106     -- då tåg5106 ej är mellan dessa signaler
+   UTF HTR N22 071                    -- lägg väg till signal 71.
+  SLT
+STN N21 ROSERSBERG                    -- På station Rosersberg
+ SIG N21 051                          -- vid signal 51
+  VAN PTF N21 031 N19 031 005106      -- vänta till tåg 5106 är mellan dessa signaler
+  SLT
+  HTR N21 031                         -- lägg väg till signal 31.
+-------------------------------------------------
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          336(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.4         Process för arbete med körplaner
+Tillvägagångssättet när man skapar eller redigerar och sedan driftsätter körplaner kan delas in i tre steg:
+      1. Redigering av en existerande eller en ny körplan. Detta utförs normalt i TPGen, men kan
+         även göras i en från EBICOS 900 fristående texteditor såsom Notepad eller Wordpad.
+         Resultatet blir en vanlig textfil.
+      2. Kompilering. Innan en körplan blir exekverbar på EBICOS 900-systemet måste den
+         kompileras, d.v.s. översättas till ett format som är exekverbart i för EBICOS 900.
+           I detta steg, som görs i TPGen, kontrolleras också att de objekt och operatörskommandon som
+           använts verkligen existerar i det aktuella systemet.
+           Kompilering sker automatiskt vid begäran om aktivering. Att enbart begära kompilering kan dock
+           vara av intresse om man har utvecklat en komplex körplan där det är troligt att man har
+           felskrivningar (buggar) som man i lugn och ro vill rätta, eller om man medvetet vill avvakta med
+           själva aktiveringssteget.
+           I kompileringen upptäcks framförallt syntaxfel och fel i objekts- och kommandonamn (mappat
+           mot referensfilerna). Syntaxfel kan t.ex. vara att en logisk sats är ofullständig, eller att en hopp-
+           sats saknar ett tillhörande hoppläge.
+      3. Aktivering innebär att den kompilerade körplanen överförs till EBICOS 900, där den blir
+         tillgänglig för exekvering.
+           Aktiveringssteget kan göras antingen för en enstaka körplan, eller för en hel uppsättning
+           körplaner på en gång, vilket är det normala när man hanterar permanenta körplaner.
+           Vid aktivering kommer körplanen automatiskt först att kompileras.
+           Observera att körplanen inte direkt börjar exekvera efter aktivering. Däremot finns den tillgänglig
+           för exekvering enligt de villkor som gäller för start av körplan. Se vidare avsnitt 8.5 Exekvering av
+           körplaner.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          337(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Ovanstående avser den normala hanteringen vid ändring av körplaner eller skapande av enstaka körplan.
+TPGen stödjer även ett annat effektivare sätt att skapa körplaner utifrån standardmallar, vilket är lämpligt
+när många likartade körplaner ska skapas. Detta beskrivs i avsnitt 8.9.5 Bygga körplaner utifrån
+standardplaner.
+
+
+8.5         Exekvering av körplaner
+När en körplan har aktiverats i systemet (se avsnitt 8.4 Process för arbete med körplaner) finns den
+tillgänglig för exekvering.
+När ett tågnummer introduceras i EBICOS 900 kommer motsvarande körplan att undersökas. Stämmer
+introduktionsdag och tid med uppgifterna i körplanens huvud kommer körplanen att börja exekveras.
+Körplanen kommer att fortsätta exekveras (vara aktiv) så länge tågnumret existerar.
+
+Om körplan saknas eller om introduktionstidpunkten är felaktig kan ett funktionslarm genereras.
+
+8.5.1       Regler för exekvering vid signal
+När ett tåg närmar sig en signal, undersöks om dess körplan ska exekveras enligt följande:
+Om samtliga krav nedan är uppfyllda kommer körplanen exekveras utan förbehåll.
+Om krav 1 och 2 är uppfyllda, men inte alla de övriga, kommer endast tågnummerkommandon att utföras.
+Kraven
+    1. Aktuellt tågnummer finns vid signalen och är först vid en eventuell kösituation.
+      2. Signalen är tillåten för automatisk tågledning.
+      3. Tåget befinner sig inom signalens läggningsavstånd (se avsnitt Läggningsavstånd nedan).
+      4. Signalen är tillslagen för automatisk tågledning.
+      5. Signalen är ej indikerad i automatdrift, d.v.s. kontrollerad av lokal automat eller av
+         automatisk körsignalupprepning.
+      6. Ingen rörelseväg är ställd eller magasinerad från signalen.
+Läggningsavstånd
+För att inte tåget ska behöva sakta in för att invänta vägläggning, finns ett läggningsavstånd definierat
+individuellt för varje signal. Läggningsavståndet bestämmer på vilket avstånd före signalen, som körplanen
+ska påbörja sin exekvering.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          338(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.6         TPGen och dess inställningar
+För skapande, redigering, kompilering och aktivering av körplaner används verktyget TPGen. Detta är en
+programapplikation med grafiskt användargränssnitt som är körbar på en PC under operativsystemet
+Windows. TPGen används oavsett om det gäller permanenta eller tillfälliga körplaner
+
+8.6.1       Allmänt
+TPGen kan köras i två olika konfigurationer:
+      •    Operativ mod (”online”) innebär att TPGen är installerad som en programapplikation på
+           operatörens arbetsstation. Den är då konfigurerad på så sätt att den har en etablerad
+           uppkoppling mot TLS-noderna i det aktuella EBICOS 900-systemet. Detta är en
+           förutsättning för att körplaner ska kunna utbytas med det aktiva systemet, d.v.s. dels
+           skickas till EBICOS 900, dels hämtas upp från EBICOS 900 för modifiering.
+      •    Förberedande mod (”offline”) innebär att TPGen körs som en från EBICOS 900 helt
+           fristående applikation. I det här läget kan körplaner redigeras och kompileras, men inte
+           aktiveras.
+           Att köra TPGen i förberedande mod är mer förbehållet speciella situationer i samband med
+           uppgradering av system eller liknande, då man vill kunna åstadkomma en driftsättning av ett
+           större antal körplaner på en och samma gång. Detta ingår inte i en operatörs normala
+           arbetsuppgifter.
+
+8.6.2       Starta TPGen
+TPGen kan startas antingen via OPStation eller som en vanlig programapplikation i Windows.
+
+En operatör ska starta TPGen via OPStation eftersom det då automatiskt kopplas upp mot det system,
+lyssnande eller aktivt, som man för närvarande kör mot. Operatören kan då enkelt växelspela mellan sina
+normala övervakningsuppgifter som tågledare och körplaneredigering i TPGen.
+
+För att starta TPGen via OPStation:
+      1. Klicka på huvudmenyikonen.
+
+
+
+           OPStations huvudmeny visas (se kapitel 2 Allmänt).
+      2. Välj TPGen.
+           TPGen startar och visar sig som ett applikationsfönster.
+Att starta TPGen som programapplikation i Windows kan t.ex. vara användbart vid konstruktion av
+permanenta körplaner på en dator utan uppkopplad OPStation.
+
+8.6.3       Användargränssnittet
+TPGens användargränssnitt består i huvudsak av följande delar:
+      •    Ett textfönster för varje öppen källkodsfil.
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          339(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      •    En texteditor med en uppsättning standardfunktioner för ordbehandling.
+      •    Dialoger för att öppna och stänga filer.
+
+
+
+
+Exempel på redigering med TPGen
+
+Fönsterhantering
+Flera filer kan hållas öppna samtidigt. De staplas då på varandra vartefter som de öppnas med Arkiv >
+Öppna. En lista över öppna fönster återfinns under menyn Fönster. Med hjälp av valen Stapla och
+Överlappa under denna meny kan fönstrens visning omplaceras på skärmen enligt önskemål.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          340(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.6.4       Förberedelser och Inställningar
+TPGen har ett antal parametrar som måste vara rätt konfigurerade. I nedanstående avsnitt ges en
+genomgång av de viktigaste inställningarna.
+
+Dessa ska normalt inte behöva ändras. Vid leverans av systemet, som även inkluderar TPGen, ska
+inställningarna redan vara rätt uppsatta.
+
+8.6.4.1     Konfigurering av anslutning
+För att TPGen ska fungera i operativ mod krävs det att den är uppkopplad mot ett aktivt EBICOS 900.
+Detta konfigureras så här:
+      1. Välj Inställningar > Anslutning.
+           Ett dialogfönster visas.
+
+
+
+
+      2. Ange inställningar för anslutningen.
+              •     Nodnummer i nätverk: Avser TPGens egen nodidentitet. Denna är
+                    anläggningsspecifik.
+              •     Sökväg till nätverksfil: Denna fil innehåller information om var det aktuella
+                    EBICOS 900-systemet återfinns och vilken kommunikationslänk som används
+                    för att kommunicera med systemet, normalt via lokalt nätverk. Inställningar
+                    och parametrar som styrs genom denna fil hör till Systemteknikerns eller
+                    Leverantörens ansvarsområde och tas därför inte vidare upp i denna manual.
+                    Det förutsätts att nätverksfilen är rätt utpekad och att den är
+                    innehållsmässigt korrekt.
+              •     Nodnummer för TLS A / TLS B: Avser den TLS-nod mot vilken TPGen ska
+                    ansluta sig till. Nod 1 och 2 om det är gemensam INF/ TLS-nod eller nod 5
+                    och 6 om det är fristående TLS-noder.
+              •     Anslut vid start: En kryssruta som styr huruvida TPGen ska ansluta till det
+                    utpekade EBICOS 900-systemet vid start eller inte, d.v.s. om TPGen ska
+                    arbeta i förberedande eller operativ mod.
+              •     Koppla ner / Anslut: En knapp med vilken man kan välja att stänga
+                    anslutningen alternativt begära anslutning mot det aktiva EBICOS 900-
+                    systemet.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          341(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.6.4.2     Inställning av sökvägar
+TPGen måste känna till var källfiler och datafiler återfinns för arbete offline. Dessa pekas ut så här:
+      1. Välj Inställningar > Mappar.
+           Ett dialogfönster visas.
+
+
+
+
+      2. Ange information om sökvägar m.m.
+              a.    Källkod: Sökväg till körplanernas källkodsfiler, d.v.s. *.txt-filerna. Om denna
+                    är korrekt inställd kommer mappens innehåll att visas direkt när man öppnar
+                    filer med Arkiv > Öppna.
+              b.    Data: Sökväg till katalogen där referensdatafilerna (RyCOMTABEDI.DAT och
+                    RyEXTNUM.DAT) ligger.
+              c.    Revision: Den revision av gällande referensdatafiler (som utpekats i Data-
+                    fältet; avser alltså variabeln ”y” i Ry*.DAT-filerna).
+              d.    Standard: Sökväg till katalogen där standardkörplanerna ligger, vilka ibland
+                    inkluderas i körplaner.
+              e.    Körplaner: Sökväg till den katalog där de kompilerade filerna ska sparas.
+              f.    Volymer: Utpekning av den katalog i det aktiva EBICOS 900-systemet där
+                    dess referensdatafiler ligger (normalt SSFILE).
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          342(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.6.4.3     Inställning av teckenstorlek m.m.
+Man kan välja hur texten i en körplan ska visas under redigering:
+      1. Välj Inställningar > Tecken.
+           Ett dialogfönster visas.
+
+
+
+
+      2. Välj storlek, font m.m. på den text som visas i det aktiva fönstret.
+
+           Denna inställning gäller endast det aktiva fönstret samt alla därefter öppnade fönster.
+
+8.6.5       Hjälp
+Det finns en hjälpfunktion som ger information angående funktionaliteten, menyer formulär m.m.
+      1. Välj Hjälp > Innehåll.
+
+8.7         Visa körplaner
+8.7.1       Visa aktiverad körplan i TPGen
+Om din avsikt bara är att titta på innehållet i en körplan som är aktiverad i EBICOS 900:
+      1. Välj Arkiv > Visa.
+           En dialogruta visas.
+      2. Välj den körplan som ska hämtas upp från EBICOS 900.
+           Körplanen laddas nu upp till OPStation för påseende. Filen har status read only, vilket innebär
+           att den inte kan redigeras.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          343(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.7.2       Visa körplaner i OPStation
+
+8.7.2.1     En körplans innehåll
+En körplan visas med operatörskommando enligt följande:
+VKP_tågnummer_(skärm_)
+Bilden är statisk. Överst visas visningskommando, körplanens nummer med eventuellt tilläggsnummer,
+introduktions- och destinationssignaler, introduktionstid, introduktionsdagar samt tidpunkt för visning.
+Därunder visas själva vägplanen.
+
+
+
+
+Visning av körplan
+
+Färgers betydelse
+      •    Kommando, körplanens nummer och eventuellt tilläggsnummer visas alltid i gult.
+      •    Introduktions- och destinationssignal samt introduktionstid visas alltid i grönt.
+      •    Samtliga tillåtna introduktionsdagar visas i bilden. De för körplanen valda dagarna visas i
+           grönt och de övriga i grått.
+      •    Tidsangivelsen för visning visas alltid i rött.
+      •    I en inaktiv körplan visas vägplanen i grönt. I en exekverande körplan markeras vägplanens
+           status enligt följande:
+             Villkor                    Grått = sant
+                                        Vitt = falskt
+                                        Grönt = ej testat
+             Kommando                   Blått = utfört
+                                        Grönt = ej utfört
+             Radnummer                  Rött = väntar
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          344(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.7.2.2     Lista tillfälliga och aktiva permanenta körplaner
+En lista över tillfälliga och aktiva permanenta körplaner visas med kommandot BTK_(popupfönster_).
+Bilden är statisk och innehåller följande:
+      •     Passiva: Tillfälliga körplaner som aktiverats men ännu inte exekveras.
+      •     Aktiva Tillf.: Tillfälliga körplaner som exekveras för tillfället.
+      •     Aktiva: Permanenta körplaner som exekveras för tillfället.
+
+
+
+
+Lista över tillfälliga och aktiva permanenta körplaner
+
+8.7.2.3     Lista tillgängliga TLS-volymer
+En lista över de TLS-volymer som finns tillgängliga samt den TLS-volym som är aktiv visas med
+kommandot LTV.
+
+
+
+
+Lista över tillgängliga TLS-volymer
+
+
+2024-09-06                     1553 - JPC 202 900              17.9.0.0             DRAFT                          345(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                         Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+För kolumnen Namn i tabellen går det att sortera innehållet enligt numerisk eller alfabetisk ordning i
+stigande eller fallande ordning.
+Följande funktioner finns i menyraden:
+ Arkiv -
+ - Skriv ut        För att skriva ut textbilden med tillgängliga TLS-volymer.
+ - Stäng           Stänger textbilden med tillgängliga TLS-volymer.
+ Sök               En sökfunktion som söker resultat i den aktuella textbilden.
+
+8.7.2.4     Visning av aktiv TLS-volym på informationspanel
+Den aktiva TLS-volymen kan även visas i ett fält på arbetsplatsens övre eller nedre informationspanel. Se
+även avsnitt 2.4.3.8 Aktiv TLS-volym.
+
+8.8         Arbeta med tillfälliga körplaner
+Operatörens normala hantering av körplaner består mest i att övervaka deras exekvering eller att göra
+tillfälliga ändringar i befintliga körplaner som redan finns aktiverade i EBICOS 900-systemet. Hela
+uppsättningen av körplaner som motsvarar tågtrafiken i tågledningscentralen finns redan definierad i det
+aktuella EBICOS 900-systemet.
+I de fall där annan tillfällig trafik ska ledas, eller där tåg med avvikande nummer ska framföras är det dock
+nödvändigt för operatören att gå in och skapa tillfälliga körplaner. Detta beskrivs i avsnitt 8.8.1 Skapa och
+redigera tillfälliga körplaner.
+I vissa felsituationer kan det även vara nödvändigt att korrigera en permanent körplan. Detta beskrivs i
+avsnitt 8.8.2 Redigera permanent körplan.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          346(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.8.1       Skapa och redigera tillfälliga körplaner
+Det normala för operatören är att skapa tillfälliga körplaner utgående från permanenta körplaner som
+hämtas upp från EBICOS 900.
+Modifiering eller skapande av körplan inleds alltid med dialogen Arkiv > Modifiera/Skapa, varvid
+dialogrutan nedan visas. I de följande underkapitlen beskrivs de olika varianterna av modifiera/skapa.
+
+
+
+
+Dialog för start av hantering av körplaner
+
+8.8.1.1     Skapa ny tillfällig körplan
+Skapa en ny tillfällig körplan baserat på en mall.
+      1. Välj Arkiv > Modifiera/Skapa.
+            Dialogen Välj körplan för körplaner öppnas.
+      2. Välj typen Skapa ny.
+      3. Ange Tågnummer för den körplan som ska skapas och klicka OK.
+            En tom körplan kommer nu att skapas i editeringsfönstret enligt en given mall. Körplanen
+            innehåller ett huvud med poster för introduktionstid och introduktionssignal, samt några
+            standardsatser för start och slut av huvud- respektive vägplaneblocket enligt följande:
+
+
+
+
+      4. Modifiera huvudblocket modifieras enligt följande:
+               •     Ersätt posten tt:mm med introduktionstid för tågnumret
+               •     Ersätt posten signal till höger om INTRSIG med aktuell
+                     introduktionssignal
+               •     Ersätt posten signal till höger om DESSIG med aktuell destinationssignal.
+
+
+2024-09-06                     1553 - JPC 202 900              17.9.0.0             DRAFT                          347(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                         Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      5. Fyll vägplaneblocket (mellan RPS och SLUT) med önskad tågledning för det aktuella tåget.
+      6. Aktivera körplanen. Se avsnitt 8.8.5 Aktivera körplan.
+           Den tillfälliga körplanen kommer att kompileras och aktiveras i EBICOS 900.
+
+8.8.1.2     Skapa ny tillfällig körplan baserat på permanent körplan
+Här avses att man gör en tillfällig modifiering av en permanent körplan som sedan exekveras en gång i
+stället för den permanenta. Det måste alltså finnas en körplan med samma tågnummer i systemet för att
+man ska kunna skapa en tillfällig körplan för det aktuella tåget.
+      1. Välj Arkiv > Modifiera/Skapa.
+           Dialogen Välj körplan öppnas.
+      2. Välj typen Tillfällig.
+      3. Ange Tågnummer för den körplan som ska skapas.
+           Alternativt kan man söka bland de befintliga tågnumren genom att trycka på knappen Sök.
+           Om vald körplan inte finns ges ett felmeddelande.
+           En dialogruta visas med möjlighet till urval bland befintliga körplaner.
+
+
+
+
+      4. Under Typ, välj mellan att visa de permanenta eller tillfälliga körplanerna, eller de som
+         redan är under redigering.
+      5. Välj körplan och klicka på OK.
+           Den aktuella körplanen laddas upp till OPStation och visas i editeringsfönstret. Körplanen kan nu
+           redigeras enligt önskemål.
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          348(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      6. Aktivera körplanen. Se avsnitt 8.8.5 Aktivera körplan.
+           Den tillfälliga körplanen kommer att kompileras och aktiveras i EBICOS 900.
+
+8.8.1.3     Skapa ny tillfällig körplan baserat på permanent körplan för annat tågnummer
+Här avses att man skapar en ny tillfällig körplan baserad på en annan körplan i systemet. Denna variant är
+lämplig om man t.ex. vill återanvända en befintlig körplan för ett nytt (tillfälligt) tågnummer.
+      1. Välj Verktyg > Modifiera/Skapa.
+           Dialogen Välj körplan öppnas
+      2. Välj typen Skapa från.
+      3. Ange Tågnummer för den körplan som ska skapas.
+      4. I fältet Från körplan anges den körplan som ska kopieras.
+      5. Klicka på OK.
+           Den körplan som ska återanvändas kommer att laddas upp i OPStation och visas i
+           editeringsfönstret med önskat tågnummer i körplanen.
+      6. Redigera körplanen för det nya tåget enligt önskemål.
+      7. Aktivera körplanen. Se avsnitt 8.8.5 Aktivera körplan.
+           Den tillfälliga körplanen kommer att kompileras och aktiveras i EBICOS 900.
+
+8.8.2       Redigera permanent körplan
+Operatörer utför normalt inte permanenta ändringar i körplaner. Detta är närmast att betrakta som ett
+systemarbete förbehållet en central systemoperatör. Ändringar i permanenta körplaner på detta sätt
+rekommenderas inte eftersom de kommer att skrivas över nästa gång en TLS-operatör skapar nya
+körplaner.
+
+      1. Välj Arkiv > Modifiera/Skapa.
+           Dialogen Välj körplan öppnas.
+      2. Välj typen Permanent.
+
+           Ändringarna i körplanen blir permanenta.
+
+      3. Ange Tågnummer för den körplan som ska modifieras, eller enklare, sök bland de befintliga
+         tågnumren genom att trycka på knappen Sök.
+           En dialogruta visas med möjlighet till urval bland befintliga körplaner. Om vald körplan inte finns
+           ges ett felmeddelande.
+      4. Klicka på OK.
+      5. Den aktuella körplanen laddas upp till OPStation och visas i editeringsfönstret. Körplanen
+         kan nu redigeras enligt önskemål.
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          349(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      6. Aktivera körplanen. Se avsnitt 8.8.5 Aktivera körplan.
+           Den tillfälliga körplanen kommer att kompileras och aktiveras i EBICOS 900.
+
+8.8.3       Avbryta redigering
+Om man av någon anledning vill avbryta redigeringen av en körplan, stänger man helt enkelt
+redigeringsfönstret med den aktuella filen, alternativt hela TPGen (utan att göra menyvalet Verktyg >
+Aktivera). Reservationen för editering av aktuell körplan tas bort i EBICOS 900.
+
+8.8.4       Kompilera körplan
+För att kompilera körplanen utan att aktivera den:
+      1. Välj Verktyg > Kompilera.
+           Den fil som ligger i det aktiva fönstret kommer nu sparas och sedan kompileras.
+Se även avsnitt 8.10.1 Fel vid kompilering.
+
+8.8.5       Aktivera körplan
+      1. Välj Verktyg > Aktivera.
+           Körplanens fil kommer nu först sparas och kompileras. Sedan kommer den att laddas ner och
+           aktiveras i den anslutna noden i EBICOS 900-systemet.
+Se även avsnitt 8.10.2 Fel vid aktivering.
+
+8.9         Arbeta med permanenta körplaner
+För att arbeta med permanenta körplaner förutsätts att man är bekant med de viktigaste begreppen
+inom området tågledning och hantering av körplaner i EBICOS 900.
+
+Operatören har full överblick över de aktiverade körplanerna i EBICOS 900. Operatören förfogar även över
+ett antal funktioner för att titta på de befintliga körplanerna, samt vid behov göra tillfälliga ändringar i
+körplanerna, alternativt skapa tillfälliga nya körplaner. Genom detta kan operatören utföra de nödvändiga
+momenten för att kunna sköta den operativa driften. Dessa funktioner förklaras ingående i avsnitt
+8.7.2.4 Visning av aktiv TLS-volym på informationspanel
+Den aktiva TLS-volymen kan även visas i ett fält på arbetsplatsens övre eller nedre informationspanel. Se
+även avsnitt 2.4.3.8 Aktiv TLS-volym.
+Arbeta med tillfälliga körplaner.
+Innan man får till stånd ett EBICOS 900-system med integrerad tågledning är det nödvändigt att skapa de
+permanenta körplanerna, samt att aktivera dem i målsystemet. TPGen ger möjlighet till aktivering i
+målsystemet, men denna funktion är endast tänkt för aktivering av enstaka körplan, vilket är tillämpligt
+när man hanterar tillfälliga körplaner.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          350(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.9.1       Hantera permanenta körplaner
+
+8.9.1.1     Bibliotek för permanenta körplaner
+Vid uppbyggnad av permanenta körplaner är det viktigt att först tänka igenom filstrukturen så att den blir
+lättöverskådlig. Antalet körplaner växer nämligen snabbt varför en bra struktur underlättar den framtida
+hanteringen. Det är också viktigt att säkerställa att filerna lagras på ett medium som regelbundet servas
+med backup.
+Man bör åtminstone skapa mappar för följande ändamål:
+      •    Källkod: För lagring av individuella källkodsfiler till körplaner (*.txt eller *.src).
+           Källkodsmappen kan delas upp i flera undermappar.
+      •    Data: För lagring av EBICOS 900-systemets referensdatafiler
+      •    Standardplaner: För lagring av standardkörplaner (*.std)
+      •    Körplaner: För lagring av de kompilerade körplanerna (*.dat).
+
+8.9.1.2     Lägg till/ta bort TLS-volym
+För att snabbt och effektivt kunna byta en uppsättning körplaner, t.ex. i samband med ett tidtabellsskifte
+finns möjligheten att definiera ett antal TLS-volymer.
+För att lägga till eller radera en TLS-volym:
+      1. Välj TLS volymer....
+
+
+
+
+            Formulär för att ändra eller ta bort TLS-volymer
+
+           Aktiv TLS-volym visas överst i dialogen och har även en speciell markering på ikonen.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          351(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      2. För att skapa en ny TLS-volym:
+              a.    Skriv in volymens namn med högst sex tecken vilka får vara 0-9 och A-Ö.
+              b.    Klicka på Skapa.
+      3. För att radera en volym, markera volymen och klicka på Ta bort.
+
+8.9.1.3     Byte av TLS-volym
+Byte av aktiv TLS-volym görs från en operatörsstation som är behörig för detta med kommandot
+BTV_namn, där namn är namnet på volymen. Samma kommando kan även läggas in i en automat för att
+exempelvis kunna exekveras vid en förutbestämd tidpunkt. Kommandot ger följande resultat:
+      •    Aktiv TLS-volym byts och alla körplaner kommer i fortsättningen att läsas från den nya
+           volymen.
+      •    För tåg vars körplan väntar på villkor kommer att omprovas mot den nya körplanen.
+
+8.9.1.4     Byte av anläggningsdata
+I samband med byte av anläggningsdata måste samtliga körplaner kompileras om, dels på grund av att de
+interna objektnumren kan vara ändrade dels att filerna måste vara namngivna med ny revision.
+Kompilering av samtliga eller utvalda körplaner sker enklast via TLS-operatör > Kompilera resp. TLS-
+operatör > aktivera.
+
+8.9.2       Skapa och redigera permanenta körplaner
+Körplaner kan skapas och redigeras lokalt på en PC. Så länge man skapar och bearbetar körplaner offline
+finns inget direkt beroende till EBICOS 900-systemet. Arbetet kan t.o.m. ske innan EBICOS 900-systemet
+är färdigprojekterat. Man bör dock beakta att man inte kommer att kunna kompilera filerna förrän man
+har tillgång till giltiga referensfiler från EBICOS 900.
+
+Det är naturligare för operatören att skapa körplaner i TPGen genom Arkiv > Modifiera/Skapa, eftersom
+detta sker synkroniserat mellan OPStation och EBICOS 900. Att likväl skapa en ny körplan lokalt kan vara
+av intresse om man vill arbeta helt fristående från EBICOS 900, utan att hindra en redan fungerande
+tågledning i EBICOS 900.
+
+8.9.2.1     Skapa ny permanent körplan
+I TPGen skapar du en körplan offline enligt följande:
+      1. Välj Arkiv > Nytt.
+           Ett tomt dokument skapas.
+      2. Bygg upp en ny körplan genom vanlig texteditering.
+           För struktur och format se avsnitt 8.3 Körplanens uppbyggnad och struktur.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          352(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      3. För att spara källkodsfilen till den nya körplanen, välj Arkiv > Spara som.
+
+Notera att källkodsfiler till körplaner även kan skapas och redigeras med annan godtycklig texteditor som
+stödjer vanligt textformat (.txt).
+
+8.9.2.2     Redigera permanent körplan offline
+En befintlig körplan redigeras offline genom att dess källkodsfil öppnas. I TPGen görs detta enligt följande:
+
+Detta avsnitt avser befintlig fil i PC eller dess anslutna disk-enheter. För redigering av befintlig
+permanent körplan i EBICOS 900, se avsnitt 8.8.2 Redigera permanent körplan.
+
+      1. Välj Arkiv > Öppna.
+      2. Välj körplan.
+      3. Redigera körplanen genom vanlig texteditering.
+           För struktur och format se avsnitt 8.3 Körplanens uppbyggnad och struktur.
+      4. För att spara den redigerade filen, välj Arkiv > Spara.
+
+Notera att källkodsfiler till körplaner även kan skapas och redigeras med annan godtycklig texteditor som
+stödjer vanligt textformat (.txt).
+
+8.9.3       Kompilera och aktivera enstaka permanenta körplaner
+
+8.9.3.1     Kompilera enstaka körplan online
+Om källkodsfilen är öppnad i TPGen, kompilera så här:
+      1. Välj Verktyg > Kompilera.
+           Den fil som ligger i det aktiva fönstret kommer nu sparas och sedan kompileras.
+           När kompileringen är färdig och felfri, kommer en exekverbar fil skapas och sparas på disk (i den
+           mapp som utpekas i Inställningar. Se avsnitt 7.2.6.2 Inställning av sökvägar).
+
+8.9.3.2     Kompilera enstaka körplan sparad lokalt
+Man kan även kompilera filer som ligger lokalt i PC:n eller dess anslutna enheter, som alltså inte har
+hämtats från EBICOS 900.
+
+Man börjar normalt alltid med att ladda upp körplaner från EBICOS 900 varefter de finns direkt
+tillgängliga i TPGens redigeringsfönster.
+
+Kompilering av lokala filer sker enligt följande:
+      1. Välj Arkiv > Kompilera.
+           En dialogruta visas nu som låter dig välja ut en eller flera filer på disken för kompilering.
+      2. Efter kompilering måste du bekräfta var på disken filen/filerna ska sparas.
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          353(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Referensfiler
+Vid kompilering behöver kompilatorn även ha tillgång till aktuell kommandofil (RyCOMTABEDI.DAT) samt
+en korsreferenstabell med externobjektnummer (RyEXTNUM.DAT). Dessa innehåller information om de
+aktuella kommandon som systemet stödjer, samt de ingående objekten i trafikområdet
+Filerna ska ligga i den mapp som utpekas i Inställningar. Se avsnitt 7.2.6.2 Inställning av sökvägar.
+
+8.9.3.3     Aktivera enstaka körplan sparad lokalt
+Det finns situationer då man inte har inlett med att utväxla körplaner med EBICOS 900, utan i stället
+skapat körplaner lokalt på OPStation-enheten, eller kanske helt offline.
+
+Detta är inte ett normalt operatörshandhavande, utan snarare något som kan användas vid driftsättning
+eller speciella felsituationer.
+
+Aktivering av lokala filer sker enligt följande:
+      1. Välj Verktyg > Aktivera.
+           Eftersom varken TPGen eller EBICOS 900 har reserverat körplanen för redigering, kommer en
+           dialogruta visas med varning om att reservation saknas för körplanen.
+      2. Välj typ av körplansaktivering:
+
+
+
+
+              •     Permanent: Körplanen aktiveras som permanent körplan. Ett villkor är att det
+                    redan finns en körplan med samma nummer i systemet.
+
+           Den befintliga körplanen kommer att ersättas med den nya.
+
+              •     Tillfällig: Körplanen aktiveras som tillfällig körplan. Det finns en permanent
+                    körplan för tåget ifråga som alltså blir satt ur spel tills den tillfälliga
+                    exekverats en gång.
+              •     Skapa tillfällig: Körplanen aktiveras som tillfällig körplan. Det finns ingen
+                    motsvarande permanent körplan för tåget ifråga.
+      3. Klicka OK för att bekräfta aktivering.
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          354(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.9.4       Kompilera och aktivera flera permanenta körplaner
+
+8.9.4.1     Kompilera flera körplaner
+För att kunna underhålla en hel uppsättning körplaner till en anläggning finns ett särskilt verktyg
+tillgängligt.
+      1. Välj TLS-operatör > Kompilera för att starta kompileringsformuläret.
+
+
+
+
+            Formulär för kompilering av körplaner
+
+      2. Öppna lämplig konfiguration om sådan finns genom att klicka på Öppna...
+           Se även avsnitt 8.9.4.3 Konfiguration för kompilering och aktivering.
+      3. Fyll i eller redigera följande information:
+              a.    Destination för kompileringen
+                    Skriv adressen till den mapp där de kompilerade körplanerna ska skrivas eller välj Sök för
+                    att använda filhanteraren.
+              b.    Källa körplaner
+                         •    Rot: Markerar rotmappen för nedanstående undermappar.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          355(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+                         •    Underliggande mappar: En eller flera mappar för körplanernas
+                              källkodsfiler.
+                              För att lägga till en mapp, skriv in adressen i den underliggande rutan eller välj
+                              Sök för att använda filhanteraren, och klicka på Lägg till. För att radera en mapp:
+                              välj raden och klicka på Ta bort.
+                         •    Filmask: Välj filändelse på källkodsfilerna beroende på om dessa är
+                              sparade som *.txt eller *.src.
+                         •    Std mapp: Välj mapp där standardkörplanerna ska hämtas från, se
+                              avsnitt 8.9.5 Bygga körplaner utifrån standardplaner.
+                         •    Uppdatera filer: Uppdaterar listan på körplaner. Denna ska användas
+                              när en ny källkodsfil eller mapp med filer lagts till. Efter detta
+                              uppdateras även Antal filer.
+              c.    Data
+                    För att kunna kompilera krävs ett antal referensfiler från EBICOS 900 antingen tas dessa
+                    direkt från EBICOS 900 eller så läggs de under mappen Mapp:
+                         •    DataRev: Den revision av gällande referensdatafiler (som utpekas i
+                              Volume-fältet; avser alltså variabeln ”y” i Ry*.DAT-filerna).
+                         •    Data från EBICOS: Denna ruta ska markeras om filerna hämtas
+                              direkt från EBICOS 900.
+                         •    Volume: Mappen i EBICOS 900 där datafilerna ligger.
+                         •    Mapp: Alternativ mapp (om Data från EBICOS inte är markerad)
+              d.    Övrigt
+                         •    För att spara tid kan man välja att endast kompilera om de filer som
+                              inte redan är kompilerade. Detta kan vara användbart exempelvis
+                              efter att kompileringsfel rättats i några av filerna. För att endast
+                              kompilera dessa filer markeras rutan Endast kompilering av märkta
+                              som ej kompilerade.
+                         •    Normalt körs hela kompileringen färdigt utan avbrott om någon fil
+                              skulle vara felaktig men vill man avbryta så fort kompileringsfel
+                              inträffar markeras rutan Avbryt vid kompileringsfel.
+      4. När ovanstående val gjorts, klicka på Kompilera
+           Samtliga filer kommer att kompileras och informationen nedan visas.
+
+
+
+
+            Progress vid kompilering av körplaner
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          356(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+           När kompileringen är klar visas informationen nedan. Antal felaktiga filer visas vid Felaktiga.
+
+
+
+
+            Kompilering klar
+
+      5. För att visa en komplett lista över status på körplaner, klicka på Visa.
+
+
+
+
+            Lista över körplaner
+
+           Status för varje fil visas med en symbol enligt följande lista:
+                          Omärkt, ej kompilerad
+
+                          Kompilerad
+
+                          Aktiverad (således kompilerad)
+                          Felaktig
+
+
+
+
+2024-09-06                     1553 - JPC 202 900              17.9.0.0             DRAFT                          357(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+           De kompilerade filerna finns nu på volymen som angetts under Destination. Dessa filer består av
+           dels *.txt som är den kompilerade filen i textformat, dels *.dat som är den fil som EBICOS 900
+           läser internt. Dessa filer kan kopieras manuellt till rätt volym på EBICOS 900 men
+           rekommendationen är att i stället använda funktionen Aktivera.
+
+8.9.4.2     Aktivera flera körplaner
+För att kunna utföra instruktionerna i detta kapitel krävs att man är behörig och inloggad som TLS-
+operatör.
+
+För att kunna underhålla en hel uppsättning körplaner till en anläggning finns ett särskilt verktyg
+tillgängligt.
+      1. Välj TLS-operatör > Aktivera för att starta aktiveringsformuläret.
+
+
+
+
+            Formulär för aktivering av körplaner
+
+      2. Öppna lämplig konfiguration om sådan finns genom att klicka på Öppna...
+           Se även avsnitt 8.9.4.3 Konfiguration för kompilering och aktivering.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          358(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      3. Fyll i eller redigera följande information:
+              a.    TLS-volym
+                    Den TLS-volym (se avsnitt 8.9.1.2 Lägg till/ta bort TLS-volym) där de färdiga körplanerna
+                    ska läggas.
+              b.    Övriga fält fylls i på samma sätt som i avsnitt 8.9.4.1 Kompilera flera
+                    körplaner.
+      4. När ovanstående val gjorts, klicka på Aktivera.
+           Samtliga filer placeras på aktuell TLS-volym.
+
+
+
+
+            Progress vid aktivering av körplaner
+
+           När aktiveringen är klar visas informationen nedan. Antal felaktiga filer visas vid Felaktiga.
+
+
+
+
+            Aktivering klar
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          359(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      5. För att visa en komplett lista över status på körplaner, klicka på Visa.
+
+
+
+
+            Lista över körplaner
+
+           Eventuella felaktiga filer är markerade med en röd bock.
+
+Vid aktiveringen kompileras alla filer på samma sätt som vid kompilering ovan. Aktiveringen använder
+alltså inte utdata från kompileringsfunktionen.
+
+8.9.4.3     Konfiguration för kompilering och aktivering
+För att lättare kunna hantera kompilering och aktivering av en uppsättning körplaner kan man göra olika
+konfigureringar för kompileringen. Dessa sparas under en särskild mapp och kan öppnas på nytt vid ett
+senare tillfälle. Samma konfiguration används för kompilering och aktivering. Den enda skillnaden är att
+fältet TLS-volym endast används vid aktivering.
+Hantera konfigurationer så här:
+      •    Öppna: Öppnar en tidigare sparad konfiguration.
+      •    Spara som...: Sparar nuvarande konfiguration under valfritt namn.
+      •    Spara: Sparar nuvarande konfiguration med samma namn som tidigare.
+
+8.9.5       Bygga körplaner utifrån standardplaner
+I många fall är trafiken utmed en linjesträckning mycket likformig. Eftersom tågledningssystemet i
+EBICOS 900 styrs utifrån körplaner per tågnummer måste ändå varje specifikt tågnummer vara kopplat till
+sin egen körplan, oavsett hur likartat körschemat är från tåg till tåg. För att undvika ett stort
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          360(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+editeringsarbete där många körplaner måste skapas med så gott som identiskt innehåll finns möjlighet att
+inkludera en standardfil i en körplan. Denna innehåller hela eller delar av tågvägsläggningen och den där
+till kopplade logiken.
+För att skapa en körplan som inkluderar en standardfil gör du så här:
+      1. Skapa standardfilen och editera in de standardsatser som ska repeteras i den tänkta serien
+         av körplaner.
+           Standardfilen ska ej innehålla huvud, ej heller slutmarkören SLUT.
+           Se till att filen ligger i den mapp som utpekas för standardfiler under Inställningar > Mappar i
+           TPGen.
+      2. Skapa en Specifik körplan och ge den filtypen *.src.
+           Editera in ett huvud med data för det tänkta tåget.
+      3. Ange i körplanen filnamnet på den standardfil som ska inkluderas. Detta ges efter
+         startmarkören RPS enligt formatet: RPS filnamn.std;
+      4. Lägg eventuellt till unika tågledningssatser för det aktuella tåget i den specifika körplanen.
+         Avsluta med den obligatoriska slutmarkören SLUT.
+
+           Tänk på att de inkluderade standardsatserna kommer att adderas till slutet på filen.
+
+      5. Kompilera.
+I samband med kompileringen kommer TPGen att skapa en textfil för den aktuella körplanen som
+innehåller både körplanens unika data och de inkluderade standardsatserna, vilka hamnar sist i filen.
+Textfilen är den fil som sedan kompileras.
+
+
+
+
+Arbetsgång vid tillämpning av standardplaner
+
+Eventuella kompileringsfel kan slå på såväl körplanens specifika del som dess standarddel. Felutpekningen
+ges i den av TPGen skapade textfilen.
+
+Fel måste korrigeras vid källan, d.v.s. antingen i standardfilen (*.std) eller i den specifika körplanefilen
+(*.src), beroende på var felet finns, men ej i den automatiskt skapade textfilen (*.txt).
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          361(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel
+Exempel på en körplan mytrain.src som inkluderar en standardplan alltrains.std:
+      START 1234
+      --Header
+        INTIME = 07:00
+        INTRSIG = signal
+        DESSIG = signal
+      RPS    alltrains.std -- include alltrains.std
+        DGN MA TI
+          SIG signal
+       HTR myk 21 myk 31
+      SLUT
+
+
+Standardplanen alltrains.std har följande innehåll:
+      DGN MA TI
+       STN station
+       SIG signal
+        VAN
+          PVS
+        SLT
+        TVN
+        VAN
+          PTE signal signal +++++
+        SLT
+      STO
+
+
+Den resulterande körplanen mytrain.txt får följande utseende:
+      START 1234
+      -- Header
+        INTIME = 07:00
+        INTRSIG = signal
+        DESSIG = signal
+      RPS    alltrains.std                       -- include alltrains.std
+        DGN MA TI
+          SIG signal
+       HTR myk 21 myk 31
+
+      -- Infogar fil: alltrains.std
+      DGN MA TI
+       STN station
+       SIG signal
+        VAN
+           PVS
+        SLT
+        TVN
+        VAN
+           PTE signal signal +++++
+        SLT
+        STO
+      --Infogning slut av fil: alltrains.std
+      SLUT
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          362(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.10 Fel vid kompilering och aktivering
+8.10.1 Fel vid kompilering
+Om ett fel i källkoden upptäcks under kompileringen kommer denna att avbrytas. Ett felmeddelande
+kopplat till raden där felet upptäcktes visas och markören positioneras vid den aktuella raden. Markörens
+position visas även på statuslisten.
+
+
+
+
+Kompileringsfel och felutpekning
+
+8.10.2 Fel vid aktivering
+Fel kan upptäckas i såväl kompileringssteget som aktiveringssteget. Trots en felfri kompilering kan ändå
+fel inträffa vid själva aktiveringen. Sådana fel visas i en dialogruta som kräver bekräftelse innan
+exekveringen fortsätter. Fel kan t.ex. orsakas av misslyckad skrivning på disk, eller p.g.a. fel i
+dataöverföring från TPGen till EBICOS 900. Varningsmeddelande genereras också om körplanens identitet
+inte är reserverad för redigering.
+
+8.11 Ta bort körplaner
+En körplan tas bort på olika sätt beroende på sammanhanget:
+      •    En aktiverad tillfällig körplan, som alltså ligger nerladdad i EBICOS 900, tas bort med
+           kommandot: RAK_tågnummer_.
+      •    Körplaner som skapats lokalt i OPStation ligger som vanliga textfiler i en mapp på någon av
+           PC:ns disk-enheter. Dessa raderas enklast med den vanliga filhanteraren.
+Permanenta körplaner kan inte raderas med operatörskommando, utan endast genom direktaccess via
+filhantering mot disken. Detta är att betrakta som teknikers arbete och beskrivs inte närmare här.
+
+8.12 Skriva ut körplaner
+Källkoden till en körplan kan skrivas ut på papper:
+      1. Välj Arkiv > Skriv ut.
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          363(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      2. En dialogruta visas som låter dig styra din utskrift med avseende på skrivare,
+         utskriftsformat m.m.
+
+8.13 Övrigt
+8.13.1 Nodöverkoppling
+      •    Vid nodöverkoppling av TLS-nod kommer automatisk tågledning för samtliga signaler i hela
+           trafikområdet att slås av. Exekverande körplaner kommer därmed att avbrytas och
+           eventuella tillfälliga körplaner kommer att raderas.
+      •    Vid nodöverkoppling av en GEO-nod kommer samtliga signaler inom geografiområdet att
+           bli avslagna från automatisk tågledning. Villkor mot en ej tillgänglig GEO-nod betraktas
+           som falskt.
+      •    Om en nodöverkoppling äger rum samtidigt som en körplan är uttagen för modifiering
+           kommer en felsituation uppstå. Den nya EBICOS 900-noden kommer inte att känna till att
+           körplanen faktiskt fortfarande är under redigering. När användaren försöker aktivera den
+           redigerade körplanen upptäcks konflikten. En kontrollfråga ställs till användaren som då
+           måste bekräfta aktiveringen.
+
+8.13.2 Körplan låst i status ”Under redigering”
+En körplan som är uttagen för modifiering hindras av EBICOS 900 från att modifieras av andra användare
+genom att den tilldelas status under redigering. Om TPGen (eller OPStation eller själva PC:n) av någon
+anledning inte kan fullfölja sin modifiering, t.ex. för att operatören av misstag stänger ner sin TPGen-
+applikation, eller p.g.a. ett PC-haveri, så skulle körplanen i fråga bli permanent låst.
+För att undvika detta finns en möjlighet att från en annan TPGen-applikation begära visning av den
+aktuella körplanen (Arkiv > Visa) och sedan utföra en ”påtvingad aktivering” (Verktyg > Aktivera). En
+kontrollfråga ställs som måste bekräftas av användaren. Trots att körplanen bara är uttagen för visning,
+återaktiveras den alltså i EBICOS 900 varefter reservationen för redigering hävs. Modifiering kan sedan
+ske i vanlig ordning genom Arkiv > Modifiera.
+Se även avsnitt 8.9.3.3 Aktivera enstaka körplan .
+
+8.13.3 Begränsningar
+Körplaner kan inte aktiveras vid eller manövrera objekt som hämtar indikeringar från angränsande system.
+Tågnummervillkor kan användas utan begränsningar.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          364(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+8.14 Sammanställning av kommandon
+8.14.1 Kommandon (för körplaner)
+ Kommando                                                 Betydelse
+ BTK_(popupfönster_)                                      Visa lista över tillfälliga och aktiva permanenta körplaner
+ VKP_tågnummer_(skärm_)                                   Visa körplan
+ TOP_(skärm_)                                             Visa första sidan
+ NSI_(skärm_)                                             Visa nästa sida
+ RAK_tågnummer_                                           Radera tillfällig körplan
+ LTV                                                      Visa tillgängliga TLS-volymer samt den TLS-volym som
+                                                          är aktiv.
+ TLS_signal_                                              Slå till TLS-drift för signal
+ TLF_signal_                                              Slå ifrån TLS-drift för signal
+ TSF_                                                     Slå till TLS-drift för samtliga signaler i geografiområdet
+ TSS_                                                     Slå ifrån TLS-drift för samtliga signaler i geografiområdet
+ BTV_                                                     Byt aktiv TLS-volym
+
+8.14.2 Huvudposter (i körplan)
+ Kommando                                                 Betydelse
+ SIG_signal                                               Signalpost
+ STN_stationsbeteckning_text                              Stationspost
+ DGN_dygn…                                                Dygnspost
+
+
+8.14.3 Kommandon (i körplan)
+ Kommando                                                 Betydelse
+ HTR_signal...                                            Begär tågväg till angiven signal
+ KVR_signal...                                            Begär växlingsväg till angiven signal
+ ALT_signal...                                            Begär alternativväg till angiven signal
+ NRM                                                      Begär normalväg
+ TBN_tågnummer                                            Byt eget tågnummer mot angivet
+ TDN_signal_tågnummer                                     Mata in angivet tågnummer vid angiven signal
+ TRN                                                      Radera eget tågnummer
+ TVN                                                      Vänd eget tågnummers rörelseriktning
+ STO                                                      Slut på tågets färd eller överlämnande till operatören för
+                                                          manuell kontroll vid aktuell signal.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          365(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+

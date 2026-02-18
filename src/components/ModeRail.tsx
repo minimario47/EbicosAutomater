@@ -10,14 +10,14 @@ interface ModeRailProps {
 }
 
 const modes: Array<{ mode: AutomationMode; label: string; icon: ReactNode }> = [
-  { mode: 'create', label: 'CREATE', icon: <RiftMarkerIcon /> },
-  { mode: 'edit', label: 'EDIT', icon: <CarryTraceIcon /> },
-  { mode: 'debug', label: 'DEBUG', icon: <PulseGridIcon /> },
+  { mode: 'create', label: 'SKAPA', icon: <RiftMarkerIcon /> },
+  { mode: 'edit', label: 'REDIGERA', icon: <CarryTraceIcon /> },
+  { mode: 'debug', label: 'FELSÖK', icon: <PulseGridIcon /> },
 ]
 
 export function ModeRail({ mode, onModeChange }: ModeRailProps) {
   return (
-    <nav className="mode-rail" aria-label="Modes">
+    <nav className="mode-rail" aria-label="Lägen">
       {modes.map((item) => (
         <button
           key={item.mode}

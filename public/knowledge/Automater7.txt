@@ -1,0 +1,3541 @@
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Skriv ut på skrivare
+Det är också möjligt att skriva ut den presenterade larmlistan direkt på en skrivare, förutsatt att det finns
+en ansluten skrivare i systemet och att arbetsplatsen har tillgång till den.
+
+6.13 Externt larm
+Ett larm kan beroende på anläggningsdata vara definierat att även ge larm i en extern ljud-/ljusenhet.
+Larm i extern ljud-/ljusenhet kvitteras via larmlista som vanligt.
+Det externa ljud-/ljuslarmet kan även stängas av med kommando AAF. Men larmet kommer då fortsatt
+vara okvitterat till larm kvitteras i larmlistan.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          245(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.          Automater
+7.1         Allmänt
+7.1.1       EBICOS 900 automatfunktion
+En automat i EBICOS 900 systemet är en samling operatörskommandon som är förprogrammerade för att
+exekveras av EBICOS 900 enligt vissa bestämda villkor. Den används för att automatiskt slå mer eller
+mindre komplicerade kommandosekvenser, ofta av rutinmässig karaktär.
+Med hjälp av ett antal programrader kan man definiera logiska satser och villkor. På så sätt kan man alltså
+förprogrammera alternativa kommandosekvenser. Vilket val som görs beror på om villkor är uppfyllda eller
+ej.
+Automatfunktionen styrs och övervakas från operatörsplatsen och kommandon synkroniseras med de som
+avges från trafikledningens övriga operatörer. Operatören startar och stoppar automaterna.
+Det kan också vara så att en startad automat startar en annan automat.
+Automater kan vara skrivna så att de exekveras och därefter avslutas eller skrivna så att de går tills
+operatören själv stoppar automaten eller att EBICOS 900 startas om.
+EBICOS 900 bygger upp en lista på alla automater i dess automatvolym vid uppstarten av systemet.
+Denna lista visar status på alla automater och kan ses i OPStation med kommando: BIA_.
+Med det fristående verktyget AutoGen kan befintliga automater modifieras samt att nya automater kan
+läggas till. Ska en automat läggas till i ett gående system, måste funktionen Modifiera/Skapa… användas.
+Med kommando RAA_automat-id_ kan en automat raderas från EBICOS 900. Automaten försvinner då
+från listan över EBICOS 900 automater och källkoden tas bort från EBICOS 900 systemet.
+Automatfunktionen abonnerar på indikeringsförändringar samt tågdata- och tågnummeruppdateringar.
+
+7.1.2       Automatfunktionens kretslopp
+Operatören använder OPStation till att starta, stoppa och övervaka EBICOS 900 automater.
+AutoGen är verktyget som används för att skapa eller modifiera automater. OPStation-datorn kan ha
+programvaran AutoGen installerad som ett fristående program. Det kan också vara så att bara vissa
+operatörsplatser har AutoGen installerad.
+En av operatören startad automat får in indikeringsstatus från ställverk genom att NCT-funktionen
+översätter inkommande data från ställverk till data som EBICOS 900 förstår. NCT uppdaterar IND-
+funktionen som är EBICOS 900 indikeringsfunktion.
+En exekverande automat kontrollerar statusen på ingående objekt enligt definierade villkor i automaten.
+Den kan t.ex. vara skriven så att den ska kontrollera om ett spårobjekt är belagt. Denna information om
+spårobjektet erhåller automaten ifrån IND-funktionen.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          246(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Baserat på denna objektstatus och hur automaten är skriven, så skickar automaten ut order, t.ex. en
+vägorder. En vägorder måste behandlas i EBICOS 900; det gör COS-funktionen. Andra typer av order kan
+skickas direkt till NCT-funktionen.
+COS-funktionen hanterar begäran om väg och gör det lite olika beroende på ställverkstyp. Vägorder
+kontrolleras av EBICOS 900 PTE-förprövningsfunktion. När PTE-funktion bedömer det lämpligt, skickas
+vägorder via NCT-funktion till ställverket.
+Som följd av ställverkets mottagna order, så skickas nya indikeringar till NCT från ställverk och så
+fortsätter det i automatfunktionens kretslopp.
+
+
+
+
+Automatfunktionens kretslopp
+
+Se även avsnitt 2.2 Fjärrstyrningens kretslopp.
+
+
+
+
+2024-09-06                     1553 - JPC 202 900              17.9.0.0             DRAFT                          247(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.1.3       Hur en automat skapas
+För redigering och kompilering av automater används verktyget AutoGen. Detta är en separat
+programapplikation med ett grafiskt användargränssnitt, som är körbar på en dator med Windows
+operativsystem.
+En automat skapas i tre steg.
+
+
+
+
+Automathantering EBICOS 900
+
+      1. Redigering utförs normalt i AutoGen, men kan även göras i en från EBICOS 900 fristående
+         texteditor såsom Notepad eller Wordpad. Resultatet blir en vanlig textfil. Det är
+         källkodsfilen för automaten.
+      2. Kompilering innebär att satserna i den redigerade textfilen (källkoden) översätts till ett
+         exekverbart format för EBICOS 900.
+           Först kontrolleras att objektidentiteter, operatörskommandon samt olika villkor som använts i
+           källkoden verkligen existerar i EBICOS 900. Detta genom att AutoGen använder vissa
+           EBICOS 900 anläggningsdatafiler för kontroll.
+           Vidare görs en kontroll på logiska fel i källkoden.
+
+           Om en ny automat ska läggas till i EBICOS 900 systemet, ska man använda funktionen
+           Modifiera/Skapa... i AutoGen. Annars måste EBICOS 900 startas om för att den nya
+           automaten ska detekteras av EBICOS 900 systemet.
+
+      3. Aktivering: I det här steget överförs den kompilerade automaten till EBICOS 900 där den
+         blir tillgänglig för exekvering. Automaten är då i viloläge. Notera att operatören själv sedan
+         måste starta automaten för att den ska exekveras.
+Automaten kan antingen vara skriven så att den efter uppstart kommer att gå kontinuerligt och ha status
+vänta villkor. Den exekveras tills automaten stoppas av operatör. Eller så kommer automaten att
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          248(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+exekveras och därefter att avslutas. En automat som avslutas eller stoppas, övergår till status viloläge
+igen.
+
+7.2         AutoGen och dess inställningar
+7.2.1       Allmänt
+AutoGen är ett fristående program som körs på en dator med Windows operativsystem. Den kan köras i
+två lägen Uppkopplad eller Lokalt.
+
+7.2.1.1     AutoGen körs uppkopplad mot EBICOS 900, operativ mod
+Det innebär att AutoGen är installerad som en programapplikation på operatörens/teknikerns
+arbetsstation. Den är då konfigurerad på så sätt att den har en etablerad uppkoppling mot en av TLS-
+noderna i aktuellt EBICOS 900 (eller INF-nod om TLS saknas).
+Denna uppkoppling är en förutsättning för att automater ska kunna utbytas mellan AutoGen och det
+aktiva EBICOS 900 systemet. Dels ska AutoGen kunna skicka en automat till EBICOS 900 systemet, dels
+kunna hämta upp automatkällkod från EBICOS 900 system för modifiering i AutoGen.
+Via uppkopplingen kan man se vilka automater som är aktiverade (finns tillgängliga i EBICOS 900
+systemet) och vilken status de har.
+
+För att kunna modifiera en automat ska den vara i status vilande, d.v.s. automaten ska inte exekveras.
+
+I AutoGens nedre list ses om verktyget är uppkopplad mot EBICOS 900 och mot vilka noder.
+I detta exempel är Autogen uppkopplad mot nod 1 och 2 (Ansluten 1 2). Vilken nod AutoGen kopplar upp
+sig mot beror på EBICOS 900 systemkonfiguration.
+
+
+
+
+7.2.1.2     AutoGen körs lokalt, förberedande mod
+När AutoGen körs lokalt innebär det att AutoGen körs utan att vara uppkopplad mot EBICOS 900. I det här
+läget kan automater redigeras och kompileras, men inte aktiveras, d.v.s. installeras i EBICOS 900. Att köra
+AutoGen lokalt på en dator kan göras för att testa/rätta en automat så att den går igenom en kompilering.
+Den fungerande källkodsfilen kan sedan via en uppkopplad AutoGen kompileras och aktiveras, d.v.s.
+läggas till i EBICOS 900 systemet.
+Det kan också användas vid speciella situationer i samband med uppgradering av system eller liknande, då
+man vill kunna åstadkomma en driftsättning av ett större antal automater på en och samma gång. Detta
+ingår inte i operatörens normala arbetsuppgifter, och kommer därför inte närmare att beskrivas i denna
+manual.
+I AutoGens nedre list visas att verktyget är inte är uppkopplad mot EBICOS 900, texten Ej ansluten visas.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          249(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.2.2       Användargränssnittet
+Användargränssnitt i AutoGen består i huvudsak av följande delar:
+      •    Ett textfönster för varje öppen källkodsfil.
+           Automatnamnet på den källkod som hanteras av AutoGen, visas i AutoGens huvud. I exemplet
+           nedan visas automat E29C3.
+           Om flera källkodsfiler är öppnade, då ligger de i fönstrets bakgrund, och kan hanteras med val
+           Fönster.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          250(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      •    En texteditor med en uppsättning standardfunktioner för ordbehandling, val ”Redigera”:
+
+
+
+
+      •    Dialoger för att öppna och välja filer:
+
+
+
+
+7.2.3       Uppdatering av automat
+Det normala sättet att hantera modifiering eller tillägg av nya automater i EBICOS 900 är att genomföra
+det i två steg:
+      1. Kompilera automat. I detta steg kontrolleras att inga fel finns i automaterna med avseende
+         på syntax m.m. Om fel noteras, uppdatera källkoden och kompilera om automater igen.
+      2. Aktivera automat. Automater kompileras därefter läses in de in i EBICOS 900 systemet
+
+7.2.4       Kompilera automat
+Detta bör göras innan aktivering för att kontrollera att automaterna inte har syntaxfel m.m. Det finns två
+metoder att kompilera automater, varav metod 1 nedan är den rekommenderade. Går kompilering enligt
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          251(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+metod 1 bra så aktiverar man automaterna i ett efterföljande steg. Då kommer automaterna både att
+kompileras och därefter läsas in i EBICOS 900 systemet.
+
+
+
+                                1
+
+
+
+
+             2
+
+
+
+
+      •    Metod 1 är det normala sättet att kompilera automater. Detta sätt används för att
+           kompilera automater som hanterats utanför EBICOS 900.
+           Automaten kan vara ny, eller det kan ha skett modifieringar i automatens källkod genom
+           funktionen Modifiera/Skapa…, så att den behöver byggas om.
+           Automaten har redigerats i en AutoGen som är ansluten till ett EBICOS 900-system. Denna
+           redigering kan vara utförd genom import av en källkodsfil eller genom redigering av en befintlig
+           källkod i EBICOS 900-systemet.
+      •    Metod 2 är alternativt sätt att kompilera filer. Den innebär att kompilera källkod som ligger
+           lokalt i datorn eller i dess anslutna enheter, som alltså inte har hämtats från EBICOS 900.
+           Sparade kompilerade automatfiler kan därefter föras över till EBICOS 900-systemet. EBICOS 900
+           kan därefter behöva startas om, för att dessa automater ska kunna hanteras i manöversystemet.
+           Detta sätt är således inte det normala sättet att uppdatera automater i EBICOS 900-systemet.
+           Detta sätt kan dock användas för att testa nyskrivna automater på en lokal dator, för att hitta fel
+           i källkod. Källkoden kan sedan föras över till en AutoGen som är ansluten till EBICOS 900-
+           systemet. En automat skapas eller modifieras med hjälp av Modifiera/Skapa… i AutoGen, och
+           källkod från extern enhet inför.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          252(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.2.5       Aktivera automat
+Det finns två sätt att aktivera, d.v.s. generera uppdaterade eller nytillagda automater för att därefter
+installera automaterna i EBICOS 900 systemet.
+
+Innan automater aktiveras bör de ha kompilerats. Detta för att se att de kommer läsas in felfritt i
+EBICOS 900-systemet.
+
+
+
+
+                                1
+
+
+
+
+              2
+
+
+
+
+      •    Metod 1 är det normala sättet att aktivera automater. Detta sätt används för att aktivera
+           automater som hanterats utanför EBICOS 900.
+           Automaten kan vara ny, eller det kan ha skett modifieringar i automatens källkod genom
+           funktionen Modifiera/Skapa…, så att den behöver aktiveras om.
+           Det normala i detta fall är att automat har hanterats utanför EBICOS 900-systemet, t.ex. i
+           AutoGen eller texteditor på en annan dator.
+      •    Metod 2 är att aktivera befintliga automater (en, flera eller alla automater) i EBICOS 900
+           automatvolym, detta handgrepp utföres normalt av tekniker. Det kan vara i ett aktivt eller
+           ett lyssnande EBICOS 900-system.
+           Orsaken till att bygga om befintliga automater enligt metod 2 kan vara att en
+           systemuppdatering, uppdatering av anläggningsdata med ny internnummertabell m.m. har
+           genomförts.
+
+7.2.6       Förberedelser och Inställningar
+AutoGen har ett antal parametrar som måste vara rätt konfigurerade. I nedanstående avsnitt ges en
+genomgång av de viktigaste inställningarna.
+Notera att dessa normalt inte ska behöva ändras. Vid leverans av systemet som även inkluderar AutoGen,
+ska inställningarna redan från början vara rätt uppsatta.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          253(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.2.6.1     Konfigurering av anslutning
+För att AutoGen ska fungera i operativ mod krävs det att den är uppkopplad mot ett Aktivt EBICOS 900.
+Detta konfigureras så här:
+      1. Gå in på menyn Inställningar och välj Anslutning.
+
+
+
+
+      2. Ett dialogfönster kommer nu upp där man kan ange inställningar för anslutning.
+         Inmatningsfälten förklaras i nedanstående punkter.
+
+
+
+
+              •     Nodnummer: Avser nodidentitet för AutoGen i EBICOS 900 system, vilken är
+                    anläggningsspecifik.
+
+Observera att nodnummeridentiteten måste vara unik, dels för varje AutoGen i ett EBICOS 900-system,
+dels får det inte kollidera med andra enheter i EBICOS 900-systemets och deras nodnummer.
+
+              •     Sökväg till nätverksfil: Denna fil innehåller information om var aktuellt
+                    EBICOS 900 återfinns och vilken kommunikationslänk som används för att
+                    kommunicera med systemet (normalt via lokalt nätverk). Inställningar och
+                    parametrar som styrs genom denna fil hör till Systemteknikerns eller
+                    Leverantörens ansvarsområde och tas därför inte vidare upp i denna manual.
+                    Det förutsätts att nätverksfilen är rätt utpekad och att den är innehållsmässigt korrekt.
+              •     Nodnummer för TLS A / TLS B: Avser den TLS-nod mot vilken AutoGen ska
+                    ansluta sig till.
+
+           För system med separata TLS-noder ska noderna 5 och 6 anges. För system som inte har
+           en fristående TLS-nod, anges istället INF/TLS-noderna 1 och 2.
+
+              •     Anslut vid start: En kryssruta som styr huruvida AutoGen ska ansluta till
+                    utpekat EBICOS 900 automatiskt vid start eller inte, d.v.s. om AutoGen ska
+                    arbeta i Lokalt eller Uppkopplat läge.
+              •     Koppla bort / Anslut: En knapp med vilken man kan välja att stänga
+                    anslutningen alternativt begära anslutning mot Aktivt EBICOS 900.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          254(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.2.6.2     Inställning av sökvägar
+AutoGen måste känna till var källfiler och datafiler återfinns. Dessa pekas ut så här:
+      1. Gå in på menyn Inställningar och välj Mappar.
+
+
+
+
+      2. Ett dialogfönster öppnas och där anges information om sökvägar m.m. Inmatningsfälten
+         förklaras i nedanstående punkter.
+           Källkod och Automat pekar dels ut varifrån källkod läses och sparas lokalt av AutoGen, och dels
+           var kompilerade automater sparas lokalt.
+           Data används av AutoGen då den körs lokalt för att läsa in EBICOS 900 anläggningsdatafiler.
+
+
+
+
+              •     Källkod: Sökväg till automaternas källkodsfiler, d.v.s. *.txt-filerna. Om denna
+                    är korrekt inställd kommer mappens innehåll att visas direkt när man öppnar
+                    filer med Arkiv > Öppna.
+
+
+
+
+              •     Revision: Den revision av gällande referensdatafiler (som utpekats i Data-
+                    fältet; avser alltså variabeln ”y” i Ry*.DAT-filerna).
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          255(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+                    Exemplet visar ”7”, Det innebär att R7COMTABEDI.DAT och R7EXTNUM.DAT kommer
+                    att användas av AutoGen då den körs lokalt.
+              •     Data: Sökväg till katalogen där referensdatafilerna, EBICOS 900
+                    anläggningsdatafiler RyCOMTABEDI.DAT och RyEXTNUM.DAT ligger. Detta
+                    data används då AutoGen körs lokalt, d.v.s. inte är uppkopplad mot
+                    EBICOS 900.
+              •     Automat: Sökväg till den katalog där de av AutoGen kompilerade filerna ska
+                    sparas lokalt.
+              •     Volym: Utpekning av den katalog i Aktivt EBICOS 900 system, där dess
+                    referensdatafiler ligger (normalt SSFILE). AutoGen använder EBICOS 900
+                    anläggningsdata från denna katalog då den är uppkopplad mot EBICOS 900.
+
+7.2.6.3     Inställning av teckenstorlek m.m.
+Man kan välja hur texten i en automat ska visas under redigering. Detta görs så här:
+      1. Gå in på menyn Inställningar och välj Tecken.
+
+
+
+
+      2. Ett dialogfönster visas där man kan välja storlek, font m.m. på den text som visas i det
+         aktiva fönstret.
+
+           Denna inställning gäller endast det aktiva fönstret samt alla därefter öppnade fönster.
+
+
+
+
+7.3         Hantering av automater i AutoGen
+Operatörens normala hantering av automater består i att titta på och ändra i automater som redan finns
+aktiverade i EBICOS 900.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          256(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+I speciella situationer, t.ex. då man vill utveckla en mer komplex automat utan att störa driften av
+EBICOS 900, kan det vara intressant att arbeta helt oberoende. Därför finns även möjlighet att skapa helt
+nya automater och att själv bestämma över när och hur de ska aktiveras i EBICOS 900.
+En ny automat som skapas genom knappen Modifiera/skapa… får status ledig och definieras som en tom
+automat. Efter upphämtning av den tomma automaten från EBICOS 900 kan den modifieras med önskat
+innehåll.
+Alternativt kan kompilerade automater kopieras in i EBICOS 900 automatvolym. Efter en omstart av
+EBICOS 900, kommer dessa nya automater att synas i listan över automater.
+
+Nya kompilerade automater som kopieras direkt in i ett gående EBICOS 900 system, syns inte i
+automatlistan. De hanteras således inte av EBICOS 900. Dessa blir tillgängliga först efter en omstart av
+EBICOS 900, då EBICOS 900 har byggt upp en ny lista på alla automater i automatvolymen.
+
+Att lägga till en ny automat i ett gående EBICOS 900 system görs genom att använda valet Arkiv >
+Modifiera/Skapa. Då läggs automat även till i EBICOS 900 lista över automater. Modifiera sedan
+innehållet, t.ex. kopiera in innehåll från en annan källkodsfil.
+
+Alla varianter på handhavande beskrivs i de följande kapitlen.
+
+7.3.1       Starta AutoGen
+AutoGen som är ett fristående program kan startas antingen som en vanlig programapplikation från
+Windows, eller via en inbyggd startknapp i OPStation. Som operatör är det mest naturligt att starta
+AutoGen via OPStation. Operatören kan då enkelt växelspela mellan sina normala övervakningsuppgifter
+som tågledare och redigering av Automater i AutoGen.
+      1. Högerklicka med musen på bildytan på någon av operatörsskärmarna för att starta
+         AutoGen via OPStation.
+           Ett dialogfönster med OPStations huvudmeny visas (se kapitel 2 Allmänt).
+      2. Välj AutoGen.
+           Programmet startar och visar sig som ett applikationsfönster.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          257(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.2       Skapa en ny automat i EBICOS 900
+Funktionen Skapa innebär att en tom automat skapas, den kommer därefter att finnas med i EBICOS 900
+lista över automater.
+En automat i EBICOS 900 skapas enligt följande:
+      1. Gå in på menyn Arkiv och välj Modifiera/Skapa.
+
+
+
+
+           En lista på automater kommer att öppnas.
+      2. Kontrollera i den öppnade Välj automat för att redigera listan, att namnet på automaten
+         inte redan används. Exempelvis ”TM8”.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          258(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      3. Mata in den nya automatens namn ”TM8” i fält: Automat och klicka sedan på OK.
+
+
+
+
+           Automat ”TM8” är nu skapad och finns även i EBICOS 900 lista på automater. Automaten
+           identitet syns i AutoGens huvud, i detta fall TM8.TXT.
+      4. Modifiera sedan innehållet i automaten till önskad funktion.
+           Det går t.ex. att kopiera in innehåll från en annan källkodsfil. Den källkoden kan vara skriven/
+           testad på en fristående AutoGen.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          259(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      5. När automaten är färdigskriven, kompilera automaten genom Verktyg > Kompilera.
+
+
+
+
+           Gick kompileringen bra visas texten Kompilera på AutoGens nedre list.
+
+
+
+
+           Eftersom automaten gick att kompilera blir det då ett kvitto på att den kan aktiveras i
+           EBICOS 900.
+      6. Automaten kan därefter aktiveras genom Verktyg > Aktivera. D.v.s. automaten kompileras
+         och läses in i EBICOS 900 systemet.
+
+
+
+
+           Gick aktiveringen bra, visas texten Aktivera på AutoGens nedre list.
+
+
+
+
+           Automaten kan nu exekveras i EBICOS 900 på begäran av operatör. En aktiverad automat får
+           status vilande.
+           Automaten startas med kommando ATI_TM8_ från OPStation.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          260(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.3       Modifiera en befintlig EBICOS 900 automat
+Modifiering innebär att man ändrar innehållet i en automat som redan är aktiverad och i status vilande i
+EBICOS 900. Detta är den allra vanligaste typen av automathantering. En förutsättning är att PC:n med
+AutoGen är ansluten till EBICOS 900.
+För att modifiera en automat:
+      1. Välj Arkiv > Modifiera/Skapa.
+
+
+
+
+      2. Välj automat att hämta upp från EBICOS 900 från fönstret Välj automat för att redigera.
+         Automaten ska vara i status vilande.
+
+           Varje automat visas med en symbol som representerar dess aktuella status. Se vidare
+           avsnitt 7.4.2 Status.
+
+           För att få en bättre överblick kan du filtrera visningen genom att välja att få se enbart
+           existerande automater, eller alla som vid tillfället är under redigering.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          261(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      3. Välj automat att hämta upp från EBICOS 900 från dialogrutan. Automaten ska vara i status
+         vilande.
+           Klicka på önskad automat. Utvald automat visas i fält Automat:
+
+
+
+
+      4. Klicka OK för att hämta automatens källkod från EBICOS 900 till AutoGen samt att sätta
+         automatens status till Reserverad för redigering.
+
+
+
+
+           Källkodsfil samt kompilerad fil för den utvalda automaten laddas upp till AutoGen och kan sedan
+           redigeras på vanligt sätt.
+           Den upphämtade automaten reserveras för den specifika OPStation-användaren ända tills den
+           blir återaktiverad i EBICOS 900. Detta innebär att ingen annan kan ta upp samma automat för
+           redigering.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          262(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      5. Välj Verktyg > Kompilera för att kompilera automaten.
+
+
+
+
+           Gick kompileringen bra, visas texten Kompilera på AutoGens nedre list.
+
+
+
+           Eftersom automaten gick att kompilera, blir det då ett kvitto på att automaten kan aktiveras i
+           EBICOS 900.
+      6. Automaten kan därefter aktiveras genom Verktyg > Aktivera. Automaten kompileras och
+         läses in i EBICOS 900-systemet.
+
+
+
+
+           Gick aktiveringen bra, visas texten Aktivera på AutoGens nedre list. Automatens fil kommer nu
+           först sparas och kompileras, sedan kommer den att laddas ner och aktiveras i den anslutna
+           noden i EBICOS 900.
+
+           Man kan välja att enbart kompilera filen om man av olika skäl vill avvakta med
+           aktiveringen, se vidare 7.3.5 Kompilera källkod till automat.
+
+
+
+
+           Automaten kan nu exekveras i EBICOS 900 på begäran av operatör. En aktiverad automat får
+           status vilande.
+           Automaten startas med kommandot ATI_E29C3_ från OPStation.
+
+           Automaten är fortfarande i viloläge (status vilande), d.v.s. den exekveras inte av
+           EBICOS 900. Den är dock färdig för exekvering på begäran av operatör. Se vidare avsnitt
+           7.7.1 Start av huvudautomat.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          263(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.3.1     Avbryta modifiering av automat
+Om man av någon anledning vill avbryta redigeringen av en automat som man tagit ut för modifiering:
+      1. Stäng redigeringsfönstret med den aktuella filen.
+      2. Alternativt, stäng hela AutoGen (utan att göra menyvalet Verktyg > Aktivera!)
+Automaten kommer att återgå till status vilande i sitt ursprungliga skick.
+
+7.3.4       Skapa och redigera källkod till en ny automat
+En ny källkodsfil för en automat skapas genom att man öppnar en ny textfil.
+
+Källkodsfiler till automater även kan skapas och redigeras med annan godtycklig texteditor som stödjer
+vanligt textformat (.txt).
+
+Skapa ny automat
+I AutoGen skapar du en ny automat enligt följande:
+      1. Gå in på menyn Arkiv och välj Ny.
+
+
+
+
+           Ett tomt dokument skapas. Automaten är Namnlös.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          264(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      2. Bygg upp en ny automat genom vanlig texteditering.
+           För struktur och format se avsnitt 7.4 Automatens uppbyggnad och struktur.
+
+
+
+
+      3. Välj Arkiv > Spara som för att spara källkodsfilen till den nya automaten.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          265(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Redigera befintlig automat
+En befintlig automatfil redigeras genom att dess källkodsfil öppnas. I AutoGen görs detta enligt följande.
+
+Detta avser befintlig fil i PC eller dess anslutna diskenheter. Redigering av befintlig automat i EBICOS 900
+kallas modifiering, vilket beskrivs i avsnitt 7.3.3 Modifiera en befintlig EBICOS 900 automat.
+
+      1. Välj Arkiv > Öppna.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          266(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      2. Välj önskad fil och klicka på Öppna.
+
+
+
+
+           Vald fil visas i AutoGens fönster, den går nu att redigera.
+
+
+
+
+      3. Efter att redigeringen är avslutad. Välj Arkiv > Spara för att spara den redigerade filen.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          267(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.4.1     Håll fler filer öppna samtidigt
+Flera filer kan hållas öppna samtidigt.
+      •    De staplas då på varandra vartefter de öppnas med Arkiv > Öppna.
+
+
+
+
+      •     En lista över öppna fönster återfinns under menyn Fönster.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          268(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      •    Med hjälp av valen Stapla/ Sortera under Fönster kan öppna fönster sorteras.
+              •     Valet Stapla. Exemplet visar 3 automater staplade på varandra.
+
+
+
+
+      •    Valet Överlappa. Under denna meny kan fönstrens visning omplaceras på skärmen enligt
+           önskemål.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          269(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.5       Kompilera källkod till automat
+Innan en automat blir exekverbar i EBICOS 900 måste den kompileras, d.v.s. översättas till ett format som
+är läsbart av systemet.
+I kompileringen upptäcks framförallt syntaxfel och fel i objekts- och kommandonamn (om de inte finns i
+referensfilerna; se nedan).
+Syntaxfel kan t.ex. vara att en logisk sats är ofullständig, eller att en hoppsats saknar ett tillhörande
+hoppläge. Se exempel i avsnitt 7.3.6.1 Felhantering.
+
+Kompilering sker automatiskt vid begäran om aktivering såsom beskrivits ovan.
+
+Att enbart begära kompilering kan vara av intresse om man har utvecklat en komplex automat där det är
+troligt att man har felskrivningar (buggar) som man i lugn och ro vill rätta, eller om man medvetet vill
+avvakta med själva aktiveringssteget.
+
+7.3.5.1     Kompilera visad automat
+En öppnad källkodsfil som visas i AutoGen-fönster, kompileras på följande sätt.
+Källkoden kan ha hämtats genom funktionerna Modifiera/Skapa…, Öppna…, eller att en att en Ny källkod
+till en automat har skapats och automatinnehåll har lagts in.
+      1. Välj Verktyg > Kompilera.
+
+
+
+
+           Den fil som ligger i det aktiva fönstret kommer nu sparas och sedan kompileras.
+           När kompileringen är färdig och felfri visas på nedre listen texten Kompilera.
+
+
+
+           Då har dels en exekverbar fil skapats och sparats på disk i den mapp som utpekas i
+           Inställningar: Automat. Källkodsfilen har sparats i en mapp som pekats ut i Inställningar:
+           Källkod.
+           Se avsnitt 7.2.6.2 Inställning av sökvägar.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          270(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.5.2     Kompilera automater sparade lokalt
+Man kan även kompilera filer direkt som ligger lokalt i datorn eller dess anslutna enheter, som alltså inte
+har hämtats från EBICOS 900.
+
+Man börjar normalt alltid med att ladda upp automater från EBICOS 900 varefter de finns direkt
+tillgängliga i redigeringsfönstret.
+
+Kompilering av lokala filer sker enligt följande:
+      1. Välj Arkiv > Kompilera.
+
+
+
+
+      2. Fönstret Öppna fil(er) för kompilering öppnas som nu som låter dig välja ut en eller flera
+         filer på disken för kompilering.
+           Förvald katalog som visas ställs in med Inställningar: Källkod, men det går att via utforskaren
+           söka upp en annan katalog på datorn och välja filer där.
+
+
+
+
+           Den först valda automaten visas i AutoGens fönster.
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          271(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      3. Efter att kompileringen är färdig och felfri för den första automaten (även om flera
+         automater valts samtidigt), visas en begäran om att peka ut i vilken katalog som de
+         exekverbara filerna (*.DAT) ska sparas.
+           Det öppnade fönstret Spara kompilerad fil visas med en förvald katalog. Den förvalda katalogen
+           finns sparad under: Inställningar: Automat.
+           Det går från detta fönster även att spara automaterna (*.DAT) på en annan plats.
+
+
+
+
+           När kompilering är klar visas den sist kompilerade automaten i AutoGens fönster och på
+           AutoGens nedre list visas texten Kompilera.
+
+
+
+
+Undvik att spara direkt ned i EBICOS 900 automatvolym eftersom:
+•         dels kopieras inte källkodsfil till automatvolymen (så att tex. modifiera/skapa funktionen kan
+          användas vid senare tillfälle)
+•         dels dualuppdateras inte automatfilen (*.DAT) av TLS eller INF-nod till dess standby sida. Med
+          risk för mismatch av automatvolymerna mellan aktiv/ standby nod.
+
+7.3.5.3     Referensfiler
+Vid kompilering behöver AutoGen ha tillgång till två aktuella anläggningsdatafiler till EBICOS 900 för att
+kunna utföra syntaxkontroll:
+      •    Kommandofil (RyCOMTABEDI.DAT)
+      •    Korsreferenstabell med objektnamn/internnummer (RyEXTNUM.DAT).
+Dessa filer ska representera de kommandon och objekt som gäller för aktuellt EBICOS 900
+anläggningsdata.
+Filerna ska ligga i den mapp (Data då AutoGen körs lokalt och Volym då AutoGen körs uppkopplad) som
+utpekas i Inställningar, se avsnitt 7.2.6.2 Inställning av sökvägar.
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          272(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.6       Fel vid kompilering
+Fel kan upptäckas i såväl kompileringssteget som i aktiveringssteget. Fel vid kompilering beskrivs vidare
+nedan. Trots en felfri kompilering kan ändå fel inträffa vid själva aktiveringen.
+Sådana fel visas i en dialogruta som kräver bekräftelse innan exekveringen fortsätter. Fel kan t.ex. orsakas
+av misslyckad skrivning på disk, eller p.g.a. fel i dataöverföring från AutoGen till EBICOS 900.
+Varningsmeddelande genereras också om automatens identitet inte är reserverad för redigering.
+
+7.3.6.1     Felhantering
+Om ett fel i källkoden upptäcks under kompileringen kommer denna att avbrytas.
+Ett felmeddelande kopplat till raden där felet upptäcktes visas och markören positioneras vid den aktuella
+raden. Markörens position visas även på statuslisten.
+I bilden nedan hamnar utpekning bredvid ett felaktigt objekt E29 LL”|”, d.v.s. objektet finns inte i
+AutoGens referensfiler. Därmed anses objektet vara ogiltigt.
+
+
+
+
+Kompileringsfel och felutpekning
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          273(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.7       Aktivering
+Aktivering innebär att AutoGen först kompilerar och sedan laddar ner en automat och dess källkodsfil till
+EBICOS 900 och låter EBICOS 900 installera den som ett objekt i sin automatuppsättning.
+
+Om en ny automat ska läggas till i EBICOS 900 systemet, då ska man använda funktionen
+Modifiera/Skapa... i AutoGen. Annars måste EBICOS 900 startas om, för att den nya automaten ska
+detekteras av EBICOS 900 systemet.
+
+7.3.7.1     Normal aktivering av automat
+Aktivering utgör normalt det avslutande steget efter kompilering, dels vid:
+      •    modifiering av befintlig EBICOS 900 automat
+      •    skapandet av en ny automat i EBICOS 900
+Det har därför redan beskrivits i avsnitt 7.3.2 Skapa en ny automat i EBICOS 900 och avsnitt
+7.3.3 Modifiera en befintlig EBICOS 900 automat.
+Det kan vid systemuppdatering eller uppdatering av anläggningsdata i EBICOS 900 behöva uppdateras en
+grupp med automater. Se avsnitt 7.3.7.2 Återaktivering av en serie automater. Detta handgrepp utförs
+normalt av tekniker på anläggningen.
+
+7.3.7.2     Återaktivering av en serie automater
+I en situation när objektsuppsättningen i EBICOS 900 har ändrats kommer de kompilerade filerna i
+målsystemet att bli inkompatibla med EBICOS 900.
+Det är då nödvändigt att återaktivera automaterna, varvid de kompileras mot de nya objektfilerna. Detta
+utföres normalt av tekniker på anläggningen.
+En speciell funktion finns för att uppgradera en hel serie automater på en gång. Detta görs enligt följande:
+      1. Välj Arkiv > Aktivera.
+           En dialogruta visas med möjlighet till urval bland befintliga automater i EBICOS 900.
+
+
+
+
+           Fönstret Välj automat(er) för att aktivera öppnas.
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          274(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      2. Om syftet är att uppgradera befintliga automater mot nya objektfiler är det naturligt att här
+         peka ut alla automater i EBICOS 900 för återaktivering. Alla automater i EBICOS 900 kan
+         väljas på två sätt:
+              •     Windows kommandot <CTRL> + <A> (välja alla) från tangentbordet.
+              •     Tryck ner <Skift> och klicka på första automaten i listan och därefter på sista
+                    automaten.
+                    Den sista automaten i gruppen syns i Automat-fältet.
+                    Då alla önskade automater är valda, klicka påOK.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          275(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      3. Om syftet är att uppgradera en grupp av automater i EBICOS 900 för återaktivering, kan
+         önskade automater i EBICOS 900 väljas genom att hålla <CTRL> nedtryckt på
+         tangentbordet och sedan klicka på önskade automater i lista.
+           Den senast valda automaten syns i Automat fältet.
+           Då önskade automater är valda, klick OK.
+
+
+
+
+           AutoGen kommer nu att gå igenom alla utvalda filer en efter en. Varje fil laddas upp en efter en
+           till AutoGen.
+           Behandlad automat visas i AutoGens fönster. Den omkompileras och återaktiveras i EBICOS 900.
+           Om ett fel inträffar vid omkompileringen (t.ex. p.g.a. att ett objekt som refereras i automaten
+           inte längre existerar i systemet), kommer genomgången avbrytas. Då får operatören möjlighet
+           att korrigera den uppladdade filen som syns i editeringsfönstret.
+      4. Efter korrigering kan återaktivering av alla, eller ett begränsat antal filer, begäras på nytt,
+         varvid proceduren upprepas. Till slut är alla filer genomgångna och därmed uppgraderade.
+           Den sist aktiverade automaten visas i AutoGens fönster och texten Aktivera visas på AutoGens
+           nedre list.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          276(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.7.3     Aktivering av lokala filer i OPStation
+Det finns situationer då man inte har inlett med att utväxla automater med EBICOS 900 genom att
+använda funktionen Modifiera/Skapa…, utan i stället valt dem lokalt på OPStation-enheten genom att
+använda: Verktyg > Ny/Öppna
+
+
+
+
+Källkoden kan vara skriven på en dator som är offline eller att man vill använda lokala filer på en
+uppkopplad AutoGen.
+I de fallen Ny har valts öppnas ett tomt textdokument som man får fylla i
+Om Öppna har valts väljs en automat från Öppna fil(er) för kompilering.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          277(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Detta är inte ett normalt operatörshandhavande, utan snarare något som kan användas vid driftsättning
+eller speciella felsituationer. Även i dessa fall måste man aktivera sin automat. Detta görs enligt följande:
+      1. Gå in på menyn Verktyg och välj Aktivera.
+
+
+
+
+      2. Eftersom varken AutoGen eller EBICOS 900 har reserverat automaten för redigering, måste
+         man nu bekräfta att man vill göra en “påtvingad aktivering”.
+           Dessutom är kan den aktuella automatidentiteten redan vara aktiverad i EBICOS 900, vilket
+           innebär att den befintliga automaten i EBICOS 900 raderas och ersätts med den nya.
+      3. Den fil som ligger i det aktiva fönstret kommer först sparas och kompileras, sedan aktiveras
+         i den anslutna noden i EBICOS 900. Går aktivering bra visas texten Aktivera i AutoGens
+         nedre list.
+
+
+
+
+7.3.8       Visning av automat
+Om avsikten bara är att titta på innehållet i en automat som är aktiverad i EBICOS 900 så kan man göra
+så här:
+      1. Gå in på menyn Arkiv och välj Visa.
+
+
+
+
+           Dialogrutan Välj automat för att visa öppnas
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          278(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      2. Välja den automat du vill hämta upp från EBICOS 900.
+           Observera att varje automat visas med en symbol som representerar dess aktuella status, se
+           vidare avsnitt 7.4.2 Status. Även här kan du välja filtrering av automater.
+
+
+
+
+      3. Källkodsfilen samt den kompilerade filen till automaten laddas nu upp till OPStation för
+         påseende. Filen har endast status Skrivskyddad vilket innebär att den inte kan redigeras.
+
+
+
+
+      4. Försöker man aktivera en automat i status skrivskyddad, erhålls först en fråga:
+
+
+
+
+           Sedan nekas aktivering p.g.a. att automaten inte är reserverad för redigering
+      5. Det finns möjlighet att göra en s.k. påtvingad aktivering för att häva att en automat
+         felaktigt reserverats för redigering, se vidare avsnitt 7.8.3 Automat modifieras vid
+         nodöverkoppling.
+           Denna manöver ska dock ej göras under normala omständigheter utan bara vid speciella
+           felsituationer. Förfarandet är detsamma som redan beskrivits i avsnitt 7.3.7.3 Aktivering av
+           lokala filer i OPStation.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          279(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.9       Varningsmeddelanden vid aktivering av automat
+Vid aktivering av en automat i EBICOS 900 genom funktion Verktyg > Aktivera krävs i vissa fall en
+bekräftelse av aktivering. Detta krävs då källkod har hanterats enligt något av valen nedan:
+      •    Arkiv > Öppna…, en befintlig källkodsfil har hämtats, t.ex. från AutoGen-datorn och visas i
+           AutoGen.
+      •    Arkiv > Ny, en ny källkodsfil har skapats i AutoGen.
+Då kommer två frågor att visas, exemplet nedan visas för automat ”TM1”. Detta eftersom EBICOS 900
+inte har registrerat att denna automat behandlats, som den skulle gjort om funktionen Modifiera/Skapa…
+hade använts i stället.
+Dessa två frågor är kopplade till två kontroller som sker vid aktivering av automat.
+Första kontrollen är att AutoGen begär en bekräftelse på att automaten ska uppdateras i EBICOS 900.
+EBICOS 900 har ingen reservation på att automaten hanteras.
+
+
+
+
+Andra kontrollen är att Autogen begär en bekräftelse på att automaten ska aktiveras, trots den inte blivit
+registrerad för redigering (modifiering) i EBICOS 900.
+
+
+
+
+Efter denna bekräftelse så är automaten aktiverad.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          280(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.9.1     Automat ej definierad
+Om automat som aktiveras inte finns i EBICOS 900 kommer det då i kontroll två i aktiveringssteget att
+visas ett felmeddelande som varnar om att automat inte är definierad.
+
+
+
+
+Automaten måste då läggas till i EBCOS 900 genom funktion Arkiv ->Modifiera/Skapa.
+
+7.3.9.2     Fel vid läsning från fil, automaten är aktiv.
+Om den modifierade automaten som ska aktiveras redan exekveras i EBICOS 900, kommer det då ett
+felmeddelande vid aktivering. Felmeddelande nedan är för automaten ”F23C3”:
+
+
+
+
+Stoppa då automaten från OPStation och prova att aktivera automaten igen.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          281(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.10 Övrigt
+
+7.3.10.1 Utskrift av automat
+Källkoden till automater kan skrivas ut på papper:
+      1. Gå in på menyn Arkiv och välj Skriv ut.
+
+
+
+
+      2. En dialogruta visas som låter dig styra din utskrift med avseende på skrivare,
+         utskriftsformat m.m.
+
+7.3.10.2 Ta bort automater
+Automater tas bort på två olika sätt beroende på sammanhanget:
+      •    En aktiverad automat, som ligger nerladdad i EBICOS 900, tas bort via operatörens
+           kommandoprompt. Detta görs med kommandot RAA_automat_
+           RAA kommandot tar bort både källkodsfil (.TXT) samt automatfil (*.DAT) från EBICOS 900
+           automatvolym.
+      •    En automat som inte ligger i EBICOS 900, utan i en vanlig mapp på någon av datorns disk-
+           enheter, hanteras som vid vanlig filhantering, d.v.s. genom att dess fil raderas med hjälp av
+           filhanteraren.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          282(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.10.3 Innehållfunktion i AutoGen
+Det finns en hjälpfunktion som ger information angående funktionaliteten, menyer, formulär m.m.
+      1. Gå in på menyn Hjälp och välj Innehåll.
+
+
+
+
+           Då öppnas ett hjälpfönster som visar i princip detta kapitels innehåll.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          283(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.3.10.4 Om AutoGen
+Det finns en hjälpfunktion som ger information angående aktuell version av AutoGen.
+      1. Gå in på menyn Hjälp och välj Om AutoGen.
+
+
+
+
+           Ett fönster öppnas som visar aktuell version på AutoGen.
+
+
+
+
+7.4         Automatens uppbyggnad och struktur
+7.4.1       Innehåll
+En automat kan innehålla följande fyra beståndsdelar:
+      •    Kommando
+      •    Logisk sats
+      •    Villkor
+      •    Hopp
+En automats innehåll visas med kommandot VAI i EBICOS 900. Med olika färger visas även resultatet
+efter sista exekveringen: Vilka kommandon som givits, vilka villkor som blev uppfyllda o.s.v.
+
+7.4.2       Status
+En automat har alltid något av nedanstående status. En sammanställning av samtliga automaters status
+visas med kommandot BIA (från kommandoprompten i EBICOS 900).
+      •    Under redigering: Automaten är under redigering/modifiering.
+      •    Blockerad: Automaten har blivit blockerad med kommando och måste återstartas eller
+           avbrytas av en operatör.
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          284(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      •    Felaktig: Automaten har markerats felaktig av EBICOS 900, den måste redigeras för att
+           åter kunna användas.
+      •    Väntar villkor: Automaten väntar på att ett objekts- eller tidsvillkor ska uppfyllas innan
+           exekveringen fortsätter.
+      •    Väntar automat: Automaten väntar på en underautomat som i sin tur väntar på ett villkor
+           som ska uppfyllas.
+      •    Vilande: Automaten är skapad men ej aktiv.
+
+Man kan även kan se automaternas status genom att begära visning av automater från AutoGen. Varje
+automats status ses då som en specifik ikonsymbol.
+
+Nedan listas automat-ikoner som beskriver en automats olika status:
+      •         Blankett med ”Z” = Vilande automat (ej exekverande)
+      •         Blankett med penna = Automat reserverad för redigering, den är ”under redigering”
+      •         Blankett med snurrande hjul = Automat under exekvering, den ”väntar villkor”
+      •         Blankett med bock = Felaktig automat
+      •          Lediga (innehållslösa) automater indikeras med tomt blad
+
+7.4.3       Övrigt
+Automater i EBICOS 900 identifieras med ett namn med högst sex tecken som får innehålla 0-9 eller A-Ö.
+Automatnamn måste skilja sig från station/terminalnamn. Exempel för Stockholm är S31 (station
+Södertälje) eller för Göteborg är JÖGB (station Jönköpings Godsbangård).
+Kommentarer är tillåtna i källkodsfilen. Dessa ska då ligga till höger om satserna och föregås av två
+bindestreck.
+
+7.4.4       Introduktionsexempel
+Som en introduktion visas här steg för steg hur en automat skapas, redigeras och används.
+Automatens funktion är att lägga en växel till höger om den är lagd till vänster och tvärt om. Kanske föga
+användbart, men den visar på ett enkelt sätt hur en automat fungerar.
+Vid kommandoprompten på EBICOS 900: ange kommando BIA_
+Starta AutoGen.
+      1. Gå in på menyn Arkiv och välj Modifiera/Skapa....
+      2. Välj automat 10 för modifiering. (Automatens start- och slutkommandon visas nu i
+         redigeringsfönstret och det går nu att fritt fylla på med fler kommandon)
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          285(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+      3. Skriv in kommandosatser i redigeringsfönstret enligt följande:
+             Kommando           Betydelse
+             START 10           Markerar början av automat nr 10
+             OMM                Logisk sats. Om villkoret är uppfyllt så...
+             QVH S19 31         Villkor. Växel S19 31 lagd till höger.
+             UTF                Utför kommando...
+             VXV S19 31         Kommando. Lägg växeln till vänster.
+             ANS                Annars utför kommando...
+             VXH S19 31         Kommando. Lägg växeln till höger.
+             SLT                Slut på logisk sats.
+             SLUT               Markerar slut på automat.
+      4. Gå in på menyn Verktyg och välj Aktivera.
+      5. Gå tillbaka till kommandoprompten i EBICOS 900 och utför följande kommandosekvens:
+             Kommando                     Betydelse
+             BIA_                         Automat 10 visas nu med status vilande
+             BLD_S19_                     Station S19 visas på bildskärmen.
+             ATI_10_                      Automat nr 10 startas. Den utför sina satser vilket leder
+                                          till att den lägger om växeln.
+             VAI_10_2_                    Automaten visas på sidoskärmen
+             ATI_10_                      Automat nr 10 startas igen, och den kommer följaktligen
+                                          lägga tillbaka växeln i ursprungsläge.
+             VAI_10_                      Jämför skärmbilderna. Färgerna visar vilket villkor som
+                                          var uppfyllt och vilket kommando som givits.
+             RAA_10_                      Automaten raderas.
+             BIA_                         Kontrollera att automat nr 10 är ledig.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          286(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.5         Visning
+7.5.1       Automats innehåll
+ Kommando                                                            Betydelse
+ VAI_automat_[skärm_]                                                Visa innehåll i automat
+Bilden är statisk. Den innehåller en överskrift med kommando, automatnummer och tidpunkt för visning,
+därefter radnummer och automatens innehåll.
+
+
+
+
+Visning av automatinnehåll
+
+Om inte automaten har exekverats någon gång efter att den aktiverats, visas allt i grönt. Om automaten
+har exekverats eller exekveras då kommandot slås, visas följande information med hjälp av olika färger:
+
+Villkor:                     Grått =                 sant
+
+                             Vitt =                  falskt
+
+
+
+Kommando:                    Blått =                 utfört
+
+                             Grönt =                 ej utfört
+
+
+
+Radnummer:                   Rött =                  väntar
+
+
+
+
+2024-09-06                    1553 - JPC 202 900                 17.9.0.0           DRAFT                          287(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+En automat med logiska operatorer använder parenteser som avgränsning, dessa parenteser visas som i
+figur nedan:
+
+  VAI-VISNING AV TABELL: 016                                                  16:45
+
+ 001              START
+ 002              OMM ! ( (QSB E31 1 )|                              grå => villkor sant
+ 003                      (QSB E31 2 )|                              vit => villkor falskt
+ 004                      (QSB E31 2 ))                              vit => villkor falskt
+ 005              UTF TRH E31 34 E31 L2                              grön => ej utförd
+ 006              SLT
+ 007              SLUT
+
+
+
+
+Visning av automat med logiska operatorer
+
+Ovanstående automat testar sant (QSB E31 1) i OMM sats, men i och med att den är inverterad ( ! ) så
+blir satsen falsk.
+
+7.5.2       Automaters status
+ Kommando                                                        Betydelse
+ BIA_[skärm_]                                                    Visa automatens status
+Bilden är statisk och innehåller tidpunkt för visning och status för samtliga automater. I följande exempel
+antas att det endast finns tre vilande automater i EBICOS 900:
+
+
+
+
+Visning av automatstatus
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          288(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.6         Automatinnehåll
+7.6.1       Kommandon
+De kommandon som accepteras i automater är ett urval av de kommandon som finns beskrivna i
+kapitel 3 Kommandon.
+
+7.6.2       Logiska satser
+För att möjliggöra villkorlig kommandogivning finns en grupp logiska satser. De inleds med en huvudpost
+som anger vilken sats det är och avslutas med en gemensam slutpost.
+Huvudposterna är:
+
+ OMM                          om villkor är sant utför A (annars B)
+
+ FAL                          beroende på sant villkor ges motsvarande kommando
+
+ VAN                          vänta tills villkor sant
+
+ NAR                          när villkor sant ge kommando annars vänta
+Slutposten är:
+
+ SLT                          gemensam slutpost
+En villkorssekvens (vs) består av ett eller fler villkor efter varandra. Antalet villkor är ej begränsat.
+En kommandosekvens (ks) består av ett eller flera kommandon efter varandra. Antalet kommandon är ej
+begränsat.
+I logiska satser gäller:
+      •    En vs är sann när samtliga villkor i sekvensen är sanna samtidigt (dock ej relativ tid). Om
+           kravet är att villkoren ska vara uppfyllda i en viss ordning måste de placeras i olika satser
+           efter varandra.
+      •    Logiska satser får ej nästlas (t.ex. en VAN sats inuti OMM). Se dock avsnitt
+           7.7.6 Underautomater.
+      •    En logisk sats har korrekt syntax först då satsen innehåller huvudpost, slutpost och
+           minimalt antal delposter.
+De kommandon och villkor, som används i exemplen senare i kapitlet, finns listade i avsnitt
+7.9 Sammanställning av kommandon.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          289(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.6.2.1      OMM-satsen
+Ingående poster
+ OMM                          huvudpost
+
+ ELR                          alternativ villkorssekvens
+
+ UTF                          utför kommandosekvens
+
+ ANS                          utför alternativ kommandosekvens
+
+ SLT                          slutpost
+
+Syntax
+      OMM    vs1
+            (ELR)
+            (vs2)
+            ( - )
+            ( - )
+      UTF    ks1
+      (ANS ks2)
+      SLT
+Delarna inom parentes är valfria. Satsen måste innehålla OMM-vs-UTF-ks-SLT. Antalet ELR-vs är ej
+begränsat.
+Funktion
+Om villkorssekvensen vs1 (eller vs2 eller ...) är sann utförs kommandosekvensen efter UTF (ks1 i syntaxen
+ovan). Om vs1 (och vs2 och ...) är falsk utförs kommandosekvensen efter ANS (ks2 i syntaxen ovan), om
+den är angiven annars hoppas satsen över. Om satsen innehåller en eller flera ELR delar betraktas satsen
+som sann om någon av villkorssekvenserna är sann.
+Exempel 1
+OMM       Vs       -sann              OMM QSB S19 101
+UTF       Ks                          UTF TRH S19 141 S19 111 S19 103
+SLT                                   SLT
+ks utförs.
+Exempel 2
+OMM       vs       -falsk             OMM QAT 16:50
+
+UTF       ks1                         UTF VRK S19 116 S19 118
+
+ANS       ks2                         ANS ATE
+
+SLT                                   SLT
+ks2 utförs.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          290(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel 3
+OMM       vs1      -falsk              OMM QAT 17:00
+          ELR                                 ELR
+
+          vs2      -sann                      QSF S19 103
+
+UTF       ks                           UTF ATE
+SLT                                    SLT
+ks utförs eftersom vs2 är sann.
+Exempel 4
+OMM       vs1      -falsk              OMM QVH S19 203
+          ELR                                 ELR
+
+          vs2      -falsk                     QVH S19 205
+
+UTF       ks                           UTF TRH S19 103 S19 109
+
+SLT                                    SLT
+satsen hoppas över, båda villkoren är falska och satsen saknar ANS del.
+
+7.6.2.2     FAL-satsen
+Ingående poster
+FAL                         huvudpost
+
+DAA                         markerar början på villkorssekvens
+
+UTF                         markerar början på kommandosekvens
+
+SLT                         slutpost
+
+Syntax
+       FAL
+       DAA vs1
+       UTF ks1
+      (DAA vs2)
+      (UTF ks2)
+      ( - )
+      ( - )
+      SLT
+Delarna inom parentes är valfria. satsen måste innehålla FAL-DAA-vs-UTF-ks-SLT. Antalet DAA-vs-UTF-ks
+är ej begränsat.
+Funktion
+Om den första villkorssekvens som är sann utförs motsvarande kommandosekvens, varefter satsen
+omedelbart efter SLT exekveras. Om ingen sekvens är sann hoppas satsen över.
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          291(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel 1
+FAL                                   FAL
+
+DAA      Vs        -sann              DAA QSB S19 101
+
+UTF      Ks                           UTF TRH S19 067 S23 061
+SLT                                   SLT
+ks utförs.
+Exempel 2
+FAL                                   FAL
+
+DAA      vs1       -falsk             DAA QSB S19 101
+UTF      ks1                          UTF TRH S19 067 S23 061
+
+DAA      vs2       -sann              DAA QSB S19 102
+
+UTF      ks2                          UTF TRH S19 067 S23 031
+SLT                                   SLT
+ks2 utförs.
+Exempel 3
+FAL                                   FAL
+
+DAA      vs1       -falsk             DAA QSB S19 101
+UTF      ks1                          UTF TRH S19 067 S23 061
+DAA      vs2       -sann              DAA QSB S19 102
+
+UTF      ks2                          UTF TRH S19 067 S23 031
+DAA      vs3       -sann              DAA QSB S19 103
+
+UTF      ks3                          UTF TRH S19 067 S23 063
+
+SLT                                   SLT
+ks2 utförs eftersom vs2 ligger före vs3.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          292(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel 4
+FAL                                   FAL
+
+DAA       vs1      -falsk             DAA QSB S19 101
+UTF       ks1                         UTF TRH S19 067 S23 061
+
+DAA       vs2      -falsk             DAA QSB S19 102
+UTF       ks2                         UTF TRH S19 067 S23 063
+
+SLT                                   SLT
+satsen hoppas över.
+
+7.6.2.3     VAN-satsen
+Ingående poster
+ VAN                          huvudpost
+
+ SLT                          slutpost
+
+Syntax
+       VAN vs
+       SLT
+Funktion
+Är villkorssekvensen sann fortsätter exekveringen omedelbart efter SLT. Om den är falsk hejdas den
+(status väntar villkor) tills dess alla villkor är uppfyllda samtidigt. När sekvensen blir sann fortsätter
+exekveringen automatiskt.
+Exempel 1
+VAN       vs       -sann              VAN QRT 00:10
+
+SLT                                   SLT
+exekveringen fortsätter.
+Exempel 2
+VAN       v1       -sann              VAN QSB S19 103
+
+          v2       -falsk                     QAT 17:00
+
+SLT                                   SLT
+exekveringen hejdas, när v2 blir sann kontrolleras v1 och v2 på nytt och om båda är sanna fortsätter
+exekveringen annars fortsätter väntan.
+
+7.6.2.4     NAR-satsen
+Ingående poster
+ NAR                          huvudpost
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          293(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+ DAA                          markerar början på en villkorssekvens
+ UTF                          markerar början på en kommandosekvens
+ SLT                          slutpost
+
+Syntax
+       NAR
+       DAA vs1
+        UTF ks1
+       (DAA vs2)
+       (UTF ks2)
+        SLT
+Delarna inom parentes är valfria. Satsen måste innehålla NAR-DAA-vs-UTF-ks-SLT. Den får högst
+innehålla två DAA-vs-UTF-ks par.
+Funktion
+Om någon villkorssekvens är sann utförs motsvarande kommandosekvens varefter exekveringen fortsätter
+efter SLT. Om båda villkorssekvenserna är falska (eller den ena om satsen bara innehåller ett DAA-UTF
+par) hejdas exekveringen (status väntar villkor). Den sekvens som först blir sann medför att dess
+kommandosekvens utförs. Observera att samtliga villkor inom en villkorssekvens måste vara sanna
+samtidigt (gäller ej QRT) för att sekvensen ska vara sann, jämför VAN.
+Exempel 1
+NAR                                   NAR
+
+DAA      vs        -falsk             DAA QAT 12:00
+UTF      ks                           UTF TRH S19 067 S23 061
+
+SLT                                   SLT
+Exekveringen hejdas tills dess hela vs är sann, varefter ks utförs och exekveringen fortsätter efter SLT.
+Exempel 2
+NAR                                   NAR
+
+DAA      vs1       -falsk             DAA QAT 12:00
+UTF      ks1                          UTF TRH S19 067 S23 061
+
+DAA      vs2       -sann              DAA QSB S19 101
+
+UTF      ks2                          UTF TRH S19 067 S23 063
+SLT                                   SLT
+ks2 utförs och exekveringen fortsätter efter SLT.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          294(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel 3
+NAR                                   NAR
+
+DAA      vs1       -falsk             DAA QAT 12:00
+UTF      ks1                          UTF TRH S19 067 S23 061
+
+DAA      vs2       -falsk             DAA QSB S19 101
+UTF      ks2                          UTF TRH S19 067 S23 063
+
+SLT                                   SLT
+Exekveringen hejdas, om vs1 blir sann först utförs ks1, om vs2 ks2, och exekveringen fortsätter efter SLT.
+
+7.6.3       Logiska operatorer
+För att möjliggöra mer avancerade logiska satser går det även att skriva automater med AND ( & ) , OR ( |
+), XOR ( ^ ), samt NOT ( ! ) satser.
+Exempel 1
+I en logisk sats används parenteser för att avgränsa villkorssekvenser samt för att ange början och slut på
+satsen.
+      OMM   ((vs1)
+            &
+            (vs2)
+            |
+            ( - )
+            ^
+            ( - ))
+       UTF    ks1
+      (ANS ks2)
+       SLT
+Exempel 2
+För att ange en logisk NOT (inverterad) sats används utropstecken. Den kan anges för hela satsen enligt
+nedan:
+      OMM   !((vs1)
+            &
+            (vs2)
+            &
+            ( - )
+            &
+            ( - ))
+       UTF    ks1
+      (ANS ks2)
+       SLT
+Resultat: Om villkorssekvenserna testar sant då blir villkor falsk, och kommando utförs ej. Om
+villkorssekvenserna testar falskt, då utförs kommando.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          295(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel 3
+Inuti en sats kan ett villkor inverteras enligt nedan:
+        OMM ((vs1)
+            &
+            !(vs2)
+            |
+            ( - )
+            ^
+            ( - ))
+       UTF    ks1
+      (ANS ks2)
+       SLT
+Resultat: Om villkorssekvenserna vs1 är sann och vs2 är falsk då blir sekvensen sann, och kommando
+utförs.
+Om villkorssekvenserna testar falskt till exempel vs2 är sann, då utförs inte kommandot. och exekveringen
+fortsätter efter SLT.
+Exekveringen hejdas, om vs1 blir sann först utförs ks1, om vs2 ks2, och exekveringen fortsätter efter SLT.
+ Funktion                           Syntax                                 Beskrivning
+ AND                                &                                      Om A och B är sann
+ OR                                 |                                      Om A och / eller B är sann
+ XOR                                ^                                      Om A eller B är sann
+ NOT                                !                                      Inverterad
+ AND                                 ((A)&(B))                             Om A och B är sann
+ OR                                  ((A)| (B))                            Om A och / eller B är sann
+ XOR                                 ((A)^ (B))                            Om A eller B är sann
+ NOT                                 !((A)| (B))                           Inverterad
+
+7.6.3.1     AND- satsen
+Exempel
+OMM                                   OMM
+
+          vs1      -falsk             ((QSB E29 001)
+          AND                         &
+
+          vs2      -sann              (QSB E29 002))
+
+UTF       ks                          UTF TRH E31 021 E31 033
+
+SLT                                   SLT
+Exekveringen hejdas tills dess hela vs är sann, varefter ks utförs och exekveringen fortsätter efter SLT.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          296(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.6.3.2     OR-satsen
+Exempel
+OMM                                   OMM
+
+          vs1      -falsk             ((QSB E29 001)
+          OR                          |
+
+          vs2      -sann              (QSB E29 002))
+
+UTF       ks                          UTF TRH E31 021 E31 033
+SLT                                   SLT
+Eftersom vs2 är sann, så utförs ks och exekveringen fortsätter efter SLT.
+
+7.6.3.3     XOR-satsen
+Exempel
+OMM                                   OMM
+
+          vs1      -falsk             ((QSB E29 001)
+          XOR                             ^
+
+          vs2      -sann              (QSB E29 002))
+
+UTF       ks                          UTF TRH E31 021 E31 033
+SLT                                   SLT
+Eftersom vs1 är falsk och vs2 är sann, så utförs ks och exekveringen fortsätter efter SLT.
+
+7.6.3.4     NAND
+Exempel 1:
+Utropstecknet före första parentesen gör AND till NAND.
+
+OMM                                   OMM
+
+          vs1         -falsk          !((QSB E29 001)
+          NAND                        &
+
+          vs2         -sann           (QSB E29 002))
+
+UTF       ks                          UTF TRH E31 021 E31 033
+SLT                                   SLT
+Då vs2 är sann och vs1 är falsk så blir satsen falsk MEN eftersom det står ett utropstecken före
+(inverterar) så blir satsen då sann, så utförs ks och exekveringen fortsätter efter SLT.
+
+
+
+
+2024-09-06                     1553 - JPC 202 900              17.9.0.0             DRAFT                          297(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel 2
+Utropstecknet före första parentesen gör AND till NAND.
+
+OMM                                   OMM
+
+          vs1         -falsk          (!((QSB E29 001)
+          NAND                        &
+
+          vs2         -sann           (QSB E29 002))
+
+          AND                         &
+
+          vs3         -sann           (QSB E29 003))
+
+UTF       ks                          UTF TRH E31 021 E31 033
+SLT                                   SLT
+Då vs2 är sann och vs1 är falsk, så blir satsen falsk. MEN eftersom det står ett utropstecken före
+(inverterar) parentesen, så blir satsen sann samt att vs3 är sann. Då utförs ks och exekveringen fortsätter
+efter SLT.
+Antalet villkor är ej begränsat.
+
+7.6.4       Villkor
+
+7.6.4.1     Objektberoende
+Villkoret är beroende av bangårdsobjekts indikering. Exempel:
+ Kommando                                                     Betydelse
+ QSK signal                                                   signal i kör
+ QSS signal                                                   signal i stopp
+
+QSA och QSM skiljer sig lite från de övriga villkoren. Huruvida en signal är i TLS-drift eller ej är en intern
+indikering i EBICOS 900. Dessa två villkor kan av den anledningen inte användas i VAN eller NAR-satser.
+
+7.6.4.2     Tidsberoende
+Villkoret är beroende av tid, absolut eller relativ.
+ Kommando                                                Betydelse
+ QAT timmar:minuter                                      absolut tid, t.ex. vänta tills klockan blir 16:20
+ QRT timmar:minuter[:sekunder]                           relativ tid, endast tillåten i VAN och NAR-satser,
+                                                         t.ex. vänta 45 min. Sekunder kan anges valfritt.
+För absoluta tider gäller att villkorstiden är uppfylld om klockan är inom intervallet (villkorstiden - 2
+minuter) till (villkorstiden + 5 minuter). Är till exempel villkorstiden 16:30, så är villkoret sant om klockan
+är i intervallet 16:28-16:35. Om villkoret är falskt och det står i en VAN eller NAR sats kommer det dock
+att bli uppfyllt exakt vid villkorstidpunkten.
+
+
+2024-09-06                     1553 - JPC 202 900              17.9.0.0             DRAFT                          298(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Relativ tid behandlas speciellt i logiska satser (VAN, NAR). I en villkorssekvens betraktas relativ tid alltid
+som uppfylld sedan den en gång blivit uppfylld.
+Exempel
+ VAN         QRT 00:05                    vänta 5 min, därefter
+             QRT 00:02                    vänta 2 min, därefter
+             QRT 00:00:45                 vänta 45 sek, därefter ska
+             QSB S19 101                  spårledning 101 vara belagd och
+             QSF S19 103                  spårledning 103 vara fri samtidigt
+ SLT
+Det relativa tidsvillkoret utgör således ett undantag från regeln att alla villkor i en villkorssekvens ska vara
+uppfyllda samtidigt.
+
+7.6.4.3     Datumberoende
+Villkoret är beroende av datum. I form av månad och dag.
+
+ Kommando                                                      Betydelse
+ QDA Månad-dag                                                 Datum i formen av månad och dag.
+
+Exempel
+VAN        QDA 12-24                         vänta till 24:e December
+           QAT 15:30                         till klockan blir 15.30
+
+SLT
+
+
+7.6.4.4     Automatberoende
+Villkoret är beroende av automatens status.
+
+ Kommando                                                      Betydelse
+ QAV automat                                                   automat vilande
+ QAE automat                                                   automat ej vilande
+
+Automatberoende villkor är ej tillåtna i VAN- och NAR-satser.
+
+7.6.4.5     Beroende på GEO-nodens tillgänglighet
+Villkoret är beroende av om en GEO är tillgänglig eller inte.
+
+ Kommando                                                      Betydelse
+ QDN geonod                                                    GEO-nod ej tillgänglig
+ QLN geonod                                                    GEO-nod tillgänglig
+
+Används för att koppla in lokala automater på stationer vars geografiområde upphört att vara tillgängligt.
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          299(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel
+ IGENN         VAN DNO 1                       Vänta till GEO-1 ej är tillgänglig
+               SLT
+               VAN QRT 00:02                   Vänta i två minuter
+               SLT
+               OM DNO 1                        Om GEO-1 ej är tillgänglig
+               UTF LAT S40 2                   Koppla in lokal automat 2 på station S40
+               UTF LAT S40 3                   Koppla in lokal automat 3 på station S40
+               SLT
+               VAN LNO 1                       Vänta till GEO-1 är tillgänglig
+               SLT
+               HOPP IGENN
+
+7.6.4.6     Tågnummerberoende
+Villkoret är beroende av tågnummer.
+
+ Kommando                                                      Betydelse
+ EXT signal tågnummer                                          Tågnummer vid signal
+ EXF signal tågnummer                                Tågnummer ej vid signal
+Villkoret är oberoende av tågets aktuella läge, det vill säga ”färgningen” av tågnummer har ingen
+betydelse.
+När villkoret prövas, prövas det första tågnumret i den önskade riktningen vid den angivna signalen. Om
+till exempel en signal med ett dubbelriktat tågnummermagasin angivits och detta innehåller två
+tågnummer, där det andra är riktat åt "rätt" håll och det första åt motsatt håll, kommer endast det andra
+tågnumret att prövas. Tågnumret kan ha ett jokertecken i godtycklig position; se avsnitt
+8.3.3.4.2 Positionsberoende.
+Tågnummervillkor är ej tillåtna i VAN- och NAR-satser.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          300(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.6.4.7     Tågdata
+Villkoret är beroende av tågdata samt om CTC har flera GEO-noder så måste GEO-noden som tågdata som
+ska jämföras anges med QLN.
+ Kommando                                        Betydelse
+ EXN signal tågnummer                            Tågnummer i jämförelsesats vid signal
+ EXM tågnummer driftform                         Tågets driftform (FS, OS, SR, SB) i jämförelsesats, gäller endast
+                                                 ERTMS fordon.
+ EXP tågnummer position                          Tågets position enligt: Avstånd i meter fram till framförvarande
+                                                 signalpunkt. Avstånd används vid ”lika med”, ”större än” och
+                                                 ”mindre än” jämförelsesatser. Gäller endast ERTMS fordon.
+ EXH tågnummer hastighet                         Tågets hastighet i jämförelsesats, gäller endast ERTMS fordon.
+ EXL tågnummer längd                             Tågets längd i jämförelsesats, gäller endast ERTMS fordon.
+Villkoren är beroende av tågdata som RBC rapporterat till CTC i ett ERTMS-system.
+Tågdata villkor är ej tillåtna i VAN- och NAR-satser. Tågdata villkor skriv i hopp satser där dessa
+kontrolleras.
+Hämta tågdata
+Nedan listas uttrycken i en automat för att hämta tågdata till en automat och dess tågdatavillkor.
+ Kommando                                                      Betydelse
+ VTN signal $train                                             Hämta tågnummer ”$train” vid angiven signal
+ VTS tågnummer $speed                                          Hämta tågets ”$speed” aktuella hastighet
+ VTM tågnummer $mode                                           Hämta tågets ”$mode” aktuella driftform
+ VTL tågnummer $length                                         Hämta tågets ”$length” längd
+ VTP tågnummer $position                                       Hämta tågets ”$position” aktuella position. Som
+                                                               utrycks i meter till framförvarande signal.
+
+Jämförelsevillkor med tågdata
+Villkoret är beroende av tågnummer, tågposition, tåghastighet.
+ Kommando                                                      Betydelse
+ QST                                                           Större än (tågnummer, tågposition, hastighet)
+ QMI                                                           Mindre än (tågnummer, tågposition, hastighet)
+ QEQ                                                           Lika med (tågnummer, tågposition, hastighet, mod)
+ QNT                                           Tågnummerförändring vid signal, t.ex. att ett
+                                               tågnummer introduceras i dess tågnummermagasin.
+Villkoren är med undantag av tågnummer beroende av tågdata som RBC rapporterat till CTC i ett ERTMS-
+system.
+Lika med bör endast användas till tågnummer och driftläge, eftersom en position eller hastighet sällan är
+exakt det önskade värdet.
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          301(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel ur tågdataautomater
+Nedan visas exempel på automat som utnyttjar tågdatavillkor. Tågdata hämtas från signal E29 34.
+VAN
+       QNT E29 34                        Vänta på en förändring i signal E29 34 tågnummermagasin
+SLT
+VTN E29 34 $train                        Hämta tågnummer från signal E29 34, t.ex. tåg 2024
+VTL $train $length                       Hämta tågets 2024 längd
+VTS $train $speed                        Hämta tågets 2024 hastighet
+VDM $train $mode                         Hämta tågets 2024 driftform
+VTP $train $position                     Hämta tågets 2024 position (avstånd från signal)
+Exempel 1
+ OMM                                    OMM
+
+           vs1          -sann           ( QEQ EXN E29 034 2024 )
+
+ UTF       ks                           UTF TRH E29 034 E29 0L2
+
+ SLT                                    SLT
+Vs1 är sann då upphämtat tågnummer är lika med 2024 vid signal E29 34, då utförs ks
+Exempel 2
+ OMM                                    OMM
+           vs1          -sann           ( QEQ EXM $train FS )
+ UTF       ks                           UTF TRH E29 034 E29 0L2
+ SLT                                    SLT
+Vs1 är sann då tågnummer 2024 har driftform FS, då utförs ks.
+Exempel 3
+ OMM                                    OMM
+           vs1          -sann           ( QMI EXN E29 34 11224 )
+ UTF       ks                           UTF TRH E29 034 E29 0L2
+ SLT                                    SLT
+Vs1 är sann då tågnummer 2024 är lägre än 11224 vid signal E29 34, då utförs ks.
+Exempel 4
+ OMM                                    OMM
+           vs1          -sann           ( QMI EXP $train E31 21 500)
+ UTF       ks                           UTF TRH E29 034 E29 0L2
+ SLT                                    SLT
+Vs1 är sann då tåg ($train) 2024 är närmare signal E31 21 än 500 m, då utförs ks.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          302(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel 5
+ OMM                                      OMM
+           vs1          -sann             ( QST EXP $train E31 21 500 )
+ UTF       ks                             UTF TRH E29 034 E29 0L2
+ SLT                                      SLT
+Vs1 är sann då tåg ($train) 2024 är längre bort ifrån framförvarande signal än 500 m, då utförs ks.
+Exempel 6
+ OMM                                    OMM
+           vs1          -sann           ( QMI EXH $train 160 )
+ UTF       ks                           UTF TRH E29 034 E29 0L2
+ SLT                                    SLT
+Vs1 är sann då tågnummer ($train) 2024har aktuell hastighet som är lägre än 160 km/h, då utförs ks.
+Exempel 7
+ OMM                                    OMM
+           vs1          -sann           ( QST EXL $train 450 )
+ UTF       ks                           UTF TRH E29 034 E29 0L2
+ SLT                                    SLT
+Vs1 är sann då tågnummer ($train) 2024 är längre 450 m, då utförs ks.
+
+7.6.5       Hopp
+För att ytterligare utöka flexibiliteten kan operatören använda hopp och lägen:
+
+ Kommando                   Betydelse
+ HOP läge            hoppa till läge ’läge’, detta kommando betraktas som ett normalt kommando och
+                     kan därför placeras i kommandodelen inuti logiska satser
+ ATN läge            markerar läget ’läge’, detta kommando kan bara placeras fristående, d.v.s. ej inuti
+                     logiska satser
+Parametern läge måste anges med exakt fem tecken. Tillåtna tecken är 0-9 och A-Z.
+
+7.6.6       Automatstatus
+Det är möjligt att visa automatens status på en bild genom att koppla automaten till ett specialobjekt.
+Dessa objekt ska vara fördefinierade i anläggningsdata: Dessa kan till exempel heta E29 C1, E29 C2, E29
+C3 och så vidare.
+
+ Kommando                                                      Betydelse
+ ASV specialobjekt                                             Visa automatstatus på specialobjekt
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          303(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel
+ START E29C1                           Automat med namn E29C1 början
+ ASV E29 C1                            Visa automatstatus på specialobjekt E29 C1.
+ VAN
+ QSB E29 1
+ SLT
+ TRH E29 21 E29 31
+ SLUT                                  Automatens slut
+
+
+7.6.6.1     Indikering av automatstatus på spårplan
+     C1            (Grå text)           = Ledig (symbol ej kopplad till automat eller automat är vilande)
+
+     C1            (Röd text)           = Blockerad
+
+     C1            (Gul text)           = vänteläge (villkor eller underautomat)
+
+     C1            (Vit text)           = Felaktig
+
+     C1            (Blinkande gul
+                                  = Väntar operatör (Operatör förväntas utföra något)
+                   bakgrund)
+
+
+7.6.7       Automat begär väntar operatör
+Det är möjligt från en automat be en operatör att utföra åtgärder. Detta genom att koppla automat till ett
+specialobjekt (automatstatussymbol) för att visa dess status. Då automaten visar väntar operatör så slår
+operatören kommandot BIA för att se vad automat begär.
+Det kan t.ex. vara meddelande ”BEKRÄFTA VÄG I HÖG” Operatören bekräftar önskemål med kommando
+AOK och nekar med kommando ANO.
+För att denna sekvens ska fungera måste givetvis automat vara skriven så den hanterar detta.
+ Kommando                                                      Betydelse
+ ADL ’text’                                                    Visa text i BIA formulär
+ AOK specialobjekt                                             Bekräfta i automatsekvens
+ ANO specialobjekt                                             Neka i automatsekvens
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          304(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Exempel 1
+Automaten nedan heter E29C2, Den är skriven så att operatören ska bekräfta att en väg ska ställas i HÖG.
+Automatens status visas på objekt E29 C2 som är vid station HÖG. I automaten skrivs vad den ska göra
+om operatören bekräftar texten (AOK), d.v.s. ställer en väg i HÖG eller nekar (ANO) där då sekvensen
+hoppar till slutet på automaten utan att ställa en väg
+                                      START E29C2
+ASV      ks                           ASV E29 C2
+VAN      vs1       -sann              VAN QSB E29 001
+SLT                                   SLT
+ADL      ks1                          ADL 'BEKRÄFTA VÄG I HÖG, AUT C2'
+NAR                                   NAR
+
+DAA      vs2       -sann              DAA AOK E29 C2
+UTF      ks2                          UTF TRH E31 021 E29 0L1
+DAA      vs3       -falsk             DAA ANO E29 C2
+UTF                                   UTF HOP AVBRY
+SLT                                   SLT
+                                      ATN AVBRY
+                                      SLUT
+Vs1 är sann då spårledning E29 001 är belagd, parameter ADL gör att objekt E29 C2
+(automatstatussymbol) visar status väntar operatör.
+Operatören slår då kommando BIA för att se vad som automat önskar.
+Då operatören slår kommando AOK E29 C2 låses väg och automat stegar vidare till SLUT.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          305(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+I formulär BIA visas vad automat E29C2 väntar på att operatören ska göra. D.v.s. Bekräfta (AOK) eller
+neka (ANO) begäran om att ”Bekräfta väg i HÖG, Aut C2”.
+
+   AUTOMATSTATUS 2018-05-10 08:10:13
+   ____________________________________________________
+   Väntar operatör
+   E29C2                      BEKRÄFTA VÄG I HÖG, AUT C2
+
+   Väntar villkor
+   E34C3
+
+   Väntar automat                      ..
+
+   Blockerade                           ..
+
+   Felaktiga                            ..
+
+   Under redigering                    ..
+
+   Vilande
+   1 10 11 12 13 14 15 16 17 18
+   19 2 20 21 22 23 24 25 26 27
+   28 29 3 30 31 33 34 35 36 37
+   38 39 4 41 42
+
+
+
+
+Visning av automatstatus, automater kan både ha bokstäver och siffror
+
+Efter att då operatören bekräftat väg i HÖG med kommando AOK E29 C2 eller efter att ha nekat med
+kommando ANO E29 C2, så stegar automat vidare.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          306(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+I exemplet nedan så väntar automaten på att operatören matar in tågnummer, därefter ställer automaten
+en tågväg. D.v.s. ställer en väg i HÖG eller nekar (ANO) där då sekvensen hoppar till slutet på automaten
+utan att ställa en väg.
+Exempel 2
+                                      START E29C3
+
+ASV      ks1       -utförd            ASV E29 C3
+ATN                                   ATN INPUT
+
+VAN      vs1       -sann              VAN QSB E29 001
+
+SLT                                   SLT
+
+         ks2       -utförd            ADL 'MATA IN TÅGNUMMER VID E29 34'
+NAR                                   NAR
+
+DAA      vs2       -sann              DAA ANO E29 C3
+
+UTF      ks3       -utförd            UTF HOP AVBRY
+DAA      vs3       -falsk             DAA QRT 00:00:05
+UTF                                   UTF HOP INFOR
+
+SLT                                   SLT
+
+                                      ATN INFOR
+
+OMM                                   OMM EXT E29 34 +++++
+
+UTF                                   UTF TRH E29 34 E29 L2
+
+                                      ANS
+
+                                      HOP INPUT
+
+                                      SLT
+
+                                      ATN AVBRY
+                                      SLUT
+Vs1 är sann då spårledning E29 001 är belagd. Parametern ADL gör att objekt E29 C2
+(automatstatussymbol) visar status väntar operatör med text mata in tågnummer vid E29 34 i BIA
+formulär.
+Då operatören ser C3 blinka på spårplan ges kommando BIA för att se vad som automat önskar.
+I formulär BIA visas att operatören ska mata in tågnummer: ”Mata in tågnummer vid E29 34”.
+Om operatören matar in tågnummer ställs tågväg E29 34 – E29 L2 av automaten. Om operatören nekar
+och slår kommando ANO E29 C3 så hoppar sekvensen ned till automatens slut. Automaten är skriven så
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          307(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+att kontrollerar om signal E29 34 har ett tågnummer, vart 5:e sekund. Om den har det, ställs tågväg E29
+34 – L2.
+I bildexempel ovan så nekade operatören med kommando ANO E29 C3.
+
+7.7         Exekvering
+7.7.1       Start av huvudautomat
+ Kommando                                Betydelse                    Förutsättning
+ ATI_automat_[rad_]                      Starta automat               Automaten måste ha status
+                                                                      vilande.
+Normalt startas automaten från rad ett, d.v.s. parametern rad utelämnas. Om ett radnummer anges,
+kommer automaten att startas från den angivna raden.
+Kommandot kan även ges från en automat. Automaten kommer då att startas på samma sätt som om
+kommandot slagits från kommandoraden, d.v.s. de båda automaterna kommer att exekveras oberoende
+av varandra.
+ Kommando                               Betydelse                Förutsättning
+ ATB_automat_[rad_]                     Starta automat med       Operatören måste vara logiskt
+                                        behörighetskontroll      knuten till det geografiområde där
+                                                                 automaten exekveras, annars
+                                                                 kommer inte kommandon att
+                                                                 fungera. Samma gäller för
+                                                                 eventuella underautomater.
+Kommandot fungerar som ATI men dessutom görs en kontroll att operatören är behörig till de objekt som
+ingår i automaten.
+
+7.7.2       Start av underautomat från automat
+ Kommando                               Betydelse                                     Förutsättning
+ ATR_automat_[rad_]                     Starta underautomat                           • Operatören måste vara logiskt
+                                                                                          knuten till det geografiområde
+                                                                                          där automaten exekveras,
+                                                                                          annars kommer inte
+                                                                                          kommandon att fungera.
+                                                                                      •
+                                                                         Kommandot kan bara ges från
+                                                                         en automat.
+Kommandot kan bara ges från en automat, vilket leder till att en underautomat exekveras innan nästa rad
+i automaten behandlas.
+
+Radnummer är inte är entydigt kända vid redigeringstillfället eftersom radnummer inte ingår i källkoden.
+För att ta reda på radnummer att starta vid måste därför den aktuella automaten först begäras upp för
+visning i EBICOS 900, varvid radnummer ses i kolumnen längst till vänster.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          308(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.7.3       Avbryt
+ Kommando                  Betydelse  Förutsättning              Resultat
+ ATA_automat_              Avbryt automat
+                                      Automaten måste ha         Automatens status förändras till
+                                      status väntar villkor,     vilande och kan sedan startas på
+                                      väntar automat eller       nytt med kommandot ATI.
+                                      blockerad.
+Om den avbrutna automaten ingår i en kedja av över- och underautomater avbryts även alla automater på
+överordnad och underordnad nivå.
+Om automat 1 anropar automat 2 som anropar automat 3 som väntar på ett objektsvillkor och automat 3
+avbryts (ATA 3) leder det till status vilande för 1, 2 och 3. Den objektsförändring som skulle ha startat
+automat 3 automatiskt om den inte avbrutits leder ej till att exekveringen fortsätter.
+
+7.7.4       Blockering
+ Kommando                          Betydelse                      Förutsättning  Resultat
+ ATS_automat_                      Blockera automat               Automaten måste ha
+                                                                                 Automatens status
+                                                                  status väntar villkor.
+                                                                                 förändras till vilande
+                                                                                 och kan sedan
+                                                                                 startas på nytt med
+                                                                                 kommandot ATI.
+Dess status ändras till blockerad, om automaten ingår i en kedja av underautomater (den understa) får
+det till följd att exekveringen även blockeras för alla överordnade automater.
+Blockeringen innebär att väntan på villkorsförändring avbryts, om villkoret blir uppfyllt fortsätter inte
+exekveringen; den fortsätter bara genom kommandot ATF.
+
+7.7.5       Återstart
+ Kommando                          Betydelse                      Förutsättning                        Resultat
+ ATF_automat_                      Fortsätt exekvering av         Automaten måste ha                   Automaten fortsätter
+                                   blockerad automat              status blockerad.                    exekvering från och
+                                                                                                       med den stas där den
+                                                                                                       blockerades.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          309(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.7.6       Underautomater
+Kommandot starta underautomat, ATR, kan som nämnts tidigare placeras inuti automater. Den leder vid
+exekveringen till att den anropade (under-) automaten först exekveras, därefter fortsätter exekveringen
+omedelbart efter anropet, se figur nedan:
+
+
+
+         Automat 1                     Automat 2                   Automat 3
+          START                         START                       START
+
+
+
+          ATR 2                         ATR 3
+
+
+
+           SLUT                          SLUT                         SLUT
+
+
+
+Exekvering av underautomater: Automat 1 startar (under-)automat 2 som startar (under-)automat 3. När automat 3 är klar,
+fortsätter automat 2 och går klart. Därefter går automat 1 klart.
+
+Om det uppstår ett fel under exekveringen av underautomater (t.ex. att status är otillåtet eller att
+radnumret där exekveringen ska starta är felaktigt) genereras ett funktionslarm om detta med information
+om felet. Den automat som upptäckt felet får status felaktig (måste modifieras för att kunna startas på
+nytt) och alla överordnade automater avbryts.
+Om den anropade automaten innehåller kommandot ATE (avbryt exekvering) avbryts endast
+underautomaten.
+
+Antalet nivåer (på djupet) på underautomater är begränsat till 6.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          310(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Med hjälp av underautomater har operatören möjlighet att nästla logiska satser:
+              Aut 1                                                         Aut 2
+ OMM QSB S19 101                                                 VAN QRT 00:02
+            QAT 10:56                                                       SLT
+ UTF ATR 2
+ SLT
+
+får samma funktion som (den otillåtna konstruktionen!):
+ OMM QSB S19 101
+            QAT 10:56
+ UTF VAN QRT 00:02
+            SLT
+
+ SLT
+
+
+7.7.7       Exekveringsexempel
+Exempel 1
+    1. Utseende automat 7:
+           START
+           TRH S19 101 S19 103
+           SLUT
+       2. Operatören slår kommandot ATI_7_ följt av VAI_7_
+       3. Visning av automat 7 visas enligt nedan. Den blå färgen innebär att kommandot är utfört.
+
+              VAI-VISNING AV TABELL: 007                                                   16:45
+
+               001             START                                             grön
+               002             TRH S19 101 S19 103                               blå
+               003             SLUT                                              grön
+
+
+Rimlighet avseende tågvägars förregling kontrolleras inte i samband med redigering och kompilering av
+automat på samma sätt som under en manuell tågvägsläggning.
+Exempel:
+TRH 101 103
+
+                                                              101
+
+                      103
+
+Ett otillåtet kommando som accepteras under redigering och kompilering av automat
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          311(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Ovanstående kommando godkänns vid kompilering. Vid exekvering av automaten kommer emellertid ett
+funktionslarm att genereras. Larmet innehåller automatens nummer och felaktig slutpunkt som orsak till
+larmet. Dock kommer inte automaten att felmarkeras.
+Exempel 2:
+Om automat 16 har status väntar villkor och visas kan den ha följande utseende:
+
+  VAI-VISNING AV TABELL: 016              16:45
+  ______________________________________________
+ 001              START
+ 002              OMM QSB S19 101                                    grå => villkor sant
+ 003                  QAT 23.56                                      vit => villkor falskt
+ 004              UTF TRH S19 101 S19 162                            grön => ej utförd
+ 005              ANS VRK S19 101 S19 162                            blå => utförd
+ 006              SLT
+ 007              ATR 1                                              blå => utförd
+ 008              VAN QRT 01.40                                      röd => väntan (rad nr)
+ 009              SLT                                                vit => villkor falskt
+ 010              SLUT
+
+
+Om ovanstående automat har startats från en annan automat, får denna överordnade automat status
+väntar automat och följande utseende:
+
+  VAI-VISNING AV TABELL: 012              16:45
+   ______________________________________________
+   001             START
+   002             FAL
+   003             DAA QSF S19 103                               grå => villkor sant
+   004             UTF ATR 16                                    röd => väntan på denna
+                                                                        rad eftersom
+                                                                        automat 16 vän-
+                                                                        tar på villkor
+   005             SLT
+   006             SLUT
+
+
+Exempel 3
+Funktionen hos en mötesautomat beskrivs i figuren nedan. När ett tåg anländer till stationen kontrolleras
+om det är fri passage. Om så är fallet ställs den snabbaste vägen genom, i annat fall växlas det först
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          312(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+anlända tåget in på ett sidospår, det mötande tåget släpps igenom och det första anlända släpps åter ut på
+linjen.
+
+
+        a) Fri passage
+
+
+            A>>
+
+
+        b) Möte, tåg A anländer först
+
+
+            A>>                                                     <<B
+
+
+                                                 A>>
+
+                                                                    <<B
+
+
+                                                 A>>
+
+                                      <<B
+
+
+
+
+          <<B                                                        A>>
+
+Funktionen hos en mötesautomat
+
+
+                                     Station XXX
+
+                                 110                           109
+                                  <             126              >
+                                  T                              T
+
+         A>>                                                                     <<B
+        T     T    T                                      T                       T         T
+          121 122                      123                     124                125
+             > <   <                                    >                      > <
+          101 102 104                                 105                    107 108
+
+
+Stationen med angivna objekt
+
+
+
+2024-09-06                     1553 - JPC 202 900              17.9.0.0             DRAFT                          313(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Figur ovan illustrerar den aktuella stationen med angivna objektnummer. Förutsättningen är att endast
+två tåg är inblandade i mötet. Mötesautomaten är uppbyggd av en huvudautomat och två
+underautomater.
+Huvudautomaten, automat 5:
+
+        START                                           -- markerar början
+
+ATN IGENN                                               -- läge ’IGENN’
+
+        NAR                                             -- alternativ väntan
+
+        DAA QSB XXX 121                                 -- när spårledning 121 belagd, tåg A
+                                                        -- först
+
+        UTF ATR 10                                      -- exekvera automat 10
+
+        DAA QSB XXX 125                                 --eller när spårledning 125 belagd,
+                                                        -- tåg B först
+
+        UTF ATR 20                                      -- exekvera automat 20
+
+        SLT                                             -- slut på väntesatsen
+
+        HOP IGENN                                       -- hoppa till ’IGENN’
+
+        SLUT                                            -- markerar slut på automat 5
+
+Automaten startas genom ATI 5 och den kommer automatiskt i ett vänteläge. Den av spårledningarna 121
+och 125 som först blir belagd medför att motsvarande underautomater exekveras och mötet äger rum
+enligt figur 5.6. Efter mötet försätts automaten på nytt i ett vänteläge genom hoppsatsen och den
+aktiveras på nytt då något tåg belägger spårledning 121 eller 125.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          314(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Automat 10, tåg A anländer först:
+         START                                                    -- början på automat 10, tåg A anländer först
+         OMM QLI XXX 101                                          -- om tåg A på väg in till signal 101
+         UTF HOP BTEST                                            -- kontrollera om tåg B på väg
+         SLT
+ ATN     VENTA                                                    -- vänteläge vid fri passage eller A på väg ut
+         VAN QSF XXX 121                                          -- vänta tills spårledning 121 fri
+         SLT
+         HOP UTHOP                                                -- hoppa ut, åter till huvudautomaten
+ ATN     BTEST                                                    -- läge för kontroll av tåg B
+         OMM QLI XXX 108                                          -- Om tåg B på väg in till signal 108
+         UTF HOP BTAGI                                            -- hoppa till ’BTAGI’
+         ANS TRH XXX 101 XXX 105 XXX 107                          -- annars lägg fri passage
+              HOP VENTA                                           -- och därefter hoppa till vänteläge
+         SLT
+ ATN     BTAGI                                                    -- arrangera mötet då tåg B på väg in
+         TRH XXX 101 XXX 109                                      -- lägg tågväg för tåg A till sidospår
+         VAN QSB XXX 126                                          -- vänta tills spårledning 126 belagd
+              QSF XXX 122                                         -- och spårledning 122 fri
+         SLT
+         TRH XXX 108 XXX 104 XXX 102                              -- lägg tågväg för tåg B genom stationen
+         VAN QSB XXX 123                                          -- vänta tills spårledning 123 belagd
+              QSF XXX 124                                         -- och spårledning 124 fri
+         SLT
+         TRH XXX 109 XXX 107                                      -- lägg tågväg ut på linjen för tåg A
+ ATN     UTHOP                                                    -- läge för uthopp, åter huvudautomat
+         SLUT
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          315(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Automat 20, tåg B anländer först:
+         START                                                    -- början på automat 20, tåg B anländer först
+         OMM QLI XXX 108                                          -- om tåg B på väg in till signal 108
+         UTF HOP ATEST                                            -- kontrollera om tåg A på väg
+         SLT
+ ATN     VENTA                                                    -- vänteläge vid fri passage eller B på väg ut
+         VAN QSF XXX 125                                          -- vänta tills spårledning 125 fri
+         SLT
+         HOP UTHOP                                                -- hoppa ut, åter till huvudautomaten
+ ATN     ATEST                                                    -- läge för kontroll av tåg A
+         OMM QLI XXX 101                                          -- Om tåg A på väg in till signal 101
+         UTF HOP ATAGI                                            -- hoppa till ’ATAGI’
+         ANS TRH XXX 108 XXX 104 XXX 102
+                HOP VENTA                                         -- hoppa till vänteläge
+         SLT
+ ATN     ATAGI                                                    -- arrangera mötet då tåg A på väg in
+         TRH XXX 108 XXX 110                                      -- lägg tågväg för tåg B till sidospår
+         VAN QSB XXX 126                                          -- vänta tills spårledning 126 belagd
+                QSF XXX 124                                       -- och spårledning 124 fri
+         SLT
+         TRH XXX 101 XXX 105 XXX 107                              -- lägg tågväg för tåg A genom stationen
+         VAN QSB XXX 123                                          -- vänta tills spårledning 123 belagd
+                QSF XXX 122                                       -- och spårledning 122 fri
+         SLT
+         TRH XXX 110 XXX 102                                      -- lägg tågväg ut på linjen för tåg B
+ ATN     UTHOP                                                    -- läge för uthopp, åter huvudautomat
+         SLUT
+Kommentarerna vid respektive rad förklarar funktionen. Observera att kommentarer måste föregås av
+dubbelt bindestreck om de ska ingå i automatens källkod.
+
+7.8         Övrigt
+7.8.1       Systemstart
+Vid systemstart av EBICOS 900 får alla tidigare redigerade automater status vilande oberoende av vilket
+status de hade när systemet togs ner. EBICOS 900 bygger upp lista på alla dess automater som finns i
+utpekad EBICOS 900 volym (vanligen AUTOMATVOL)
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          316(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.8.2       Nodöverkoppling
+Exekverande automater kommer att avbrytas vid en nodöverkoppling av TLS-noder eller INF noder (i de
+anläggningar där inte TLS noder finns).
+Automaterna får då status vilande.
+Operatören måste då återstarta de automater som var igång innan nodöverkopplingen.
+Vid en överkoppling av en GEO-nod bör aktuella automater kontrolleras och eventuellt startas om.
+
+7.8.3       Felsituationer
+
+7.8.3.1     Automat modifieras vid nodöverkoppling
+Om en TLS-nodöverkoppling (eller INF-nodöverkoppling i anläggning utan TLS nod) äger rum, samtidigt
+som en automat är uttagen för modifiering kommer en felsituation uppstå.
+Den nya aktiva EBICOS 900-noden kommer inte att känna till att automaten faktiskt fortfarande är under
+redigering.
+Då den redigerade automaten aktiveras, upptäcks en konflikt av EBICOS 900 systemet.
+En kontrollfråga ställs till användaren som då måste bekräfta aktiveringen genom att trycka på Ja.
+
+
+
+
+Kontrollfråga från EBICOS 900: Automaten TM1 är inte reserverad för redigering
+
+Den i EBICOS 900 befintliga automaten blir då ersatt av den som redigerats i AutoGen.
+
+7.8.3.2     Automat fast i redigeringsläge vid aktivering av automat
+En automat kan fastna i redigeringsläge om aktivering av en modifierad automat misslyckats.
+Detta kan ske om det är fel i källkoden för en automat vid aktivering av en grupp av automater och att
+t.ex. användaren därefter avslutat Autogen.
+En fastnad automat upptäckas genom att:
+      •    Automaten inte kan aktiveras. Kommandoresponsen blir Ogiltigt status.
+      •    När man öppnar automatstatuslistan markeras automaten med Under redigering
+      •    Ikonsymbolen i formuläret för redigerad automat visas med en penna.
+           Exemplet nedan visar automat ”3” under redigering:
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          317(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Det går inte att komma ur redigeringsläget genom att:
+      •    Aktivera automaten
+      •    Välja Modifiera/ Skapa automat
+Genom att kompilera om automaten, kan automaten byta status och komma ur redigeringsläget:
+      1. Välj Arkiv > Kompilera.
+
+
+
+
+      2. Välj den automat som har fastnat under redigering.
+      3. Redigera/korrigera automaten, så att den kan kompileras utan anmärkning
+      4. Välj Verktyg > Aktivera….
+
+
+
+
+      5. Ett varningsmeddelande visas.
+           Nedan visas exempel för automat TM1:
+
+
+
+
+      6. Svara Ja om du vill ersätta automaten.
+      7. Automaten blir då sparad, aktiverad och hamnar i status vilande.
+
+7.8.3.3     Automat fast i redigeringsläge p.g.a. fel i AutoGen
+En automat som är uttagen för modifiering hindras av EBICOS 900 från att modifieras av andra
+användare genom att den tilldelas en status: Automat reserverad för redigering.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          318(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+Det kan hända att AutoGen, eller själva datorn, av någon anledning inte kan fullfölja sin modifiering, t.ex.
+på grund av att:
+      •    operatören råkar av misstag stänger ner sin AutoGen-applikation och därefter inte kan få
+           igång applikationen igen
+      •    ett datorhaveri så att automaten blir permanent låst
+Automaten ligger då fast i Under redigering-läget, och kan inte nås med den AutoGen-applikation som
+påbörjade modifieringen.
+Det går att komma ur redigeringsläget genom att använda en annan AutoGen-applikation, d.v.s. från en
+annan dator. Gör följande:
+      1. Begär visning av automaten från annan AutoGen-applikation genom Arkiv > Visa.
+
+
+
+
+      2. Utför en ”påtvingad aktivering” genom Verktyg > Aktivera.
+
+
+
+
+      3. En kontrollfråga ställs. Bekräfta genom att klicka påJa.
+
+
+
+
+            Kontrollfråga om påtvingad aktivering av automat TM1
+
+           Trots att automaten bara är uttagen för visning, återaktiveras den alltså i EBICOS 900 varefter
+           reservationen för redigering hävs och den återfår status vilande.
+      4. Modifiering kan sedan ske i vanlig ordning genom Arkiv > Modifiera/Skapa....
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          319(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.8.4       Begränsningar
+      •    Start av automat har ingen direkt koppling till behörighet. Det innebär t.ex. att vilken
+           operatör som helst kan starta en automat, trots att den påverkar objekt inom annan
+           operatörs behörighetsområde. Däremot kommer inte kommandon och villkorstester mot
+           objekt som operatören inte är behörig för att fungera.
+      •    Vid kompilering av en automat kontrolleras objekts existens samt kommandots syntax.
+           Huruvida tågvägar är rimliga, tillåtna m.m., kontrolleras först vid exekvering av automaten.
+      •    Antalet underautomater (på djupet) är begränsat till 6. Om denna gräns överskrids avbryts
+           automaten och dess underautomater, dess status sätts till felaktig och ett funktionslarm
+           genereras.
+      •    Automater kan inte manövrera objekt som hämtar indikeringar från angränsande system.
+           Följande villkor är inte tillåtna eller har begränsad funktionalitet med objekt som hämtar
+           indikeringar från angränsande system.
+              •     Låst/ej låst väg från signal, QTB/QTE
+                    Villkoret låst väg kommer att vara uppfyllt om färgen på signalen inte är grå, blå eller vit.
+              •     Låst/ej låst väg till signal, QTB/QTE
+                    Detta villkor är inte möjligt att använda eftersom låst slutpunkt inte säkert kan avgöras
+                    endast med information om färgen på signalen.
+              •     Magasinerad/ej magasinerad slutpunkt, QMS/QME
+                    Detta villkor är inte möjligt att använda eftersom indikeringen för magasinerad slutpunkt i
+                    stället kan visa magasinerad börjanpunkt om signalen ingår i en lång väg.
+              •     Signal i/ej i TLS-drift, QSA/QSM
+                    Detta villkor är inte möjligt att använda eftersom indikeringen för TLS-drift även kan visa
+                    magasinerad början- eller slutpunkt.
+              •     Belagd/ej belagd spårledning på linjen, QLB/QLF
+                    Detta villkor kan bara användas om linjeblocksobjektet innehåller en indikering av att
+                    någon spårledning på linjen är belagd.
+
+7.8.5       Orsaker till felmarkering av automat
+En automat kan försättas i status felaktig av ett antal olika orsaker. För att underlätta felsökning följer här
+en lista av möjliga orsaker.
+      •    En loop utan villkor eller där villkoret är uppfyllt.
+      •    Anrop av underautomat med felaktigt status.
+      •    Anrop av underautomat med felaktig radangivning.
+      •    Max antal underautomater överskridet.
+
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          320(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+7.9         Sammanställning av kommandon
+Nedanstående listor avser kommandon från kommandoprompten i EBICOS 900. För handhavande av
+AutoGen som används för redigering av automater, se avsnitt 7.2. AutoGen och dess inställningar.
+
+7.9.1       Kommandon för automater
+ Kommando                                   Betydelse
+ BIA_[skärm_]                               Visa automatstatus
+ VAI_automat_ [skärm_]                      Visa automat
+ ATI_automat_ [rad_]                        Starta automat (från angiven rad)
+ ATB_automat_ [rad_]                        Starta automat (från angiven rad) med behörighetskontroll.
+ ATA_automat_                               Avbryt automat
+ ATS_automat_                               Blockera automat
+ ATF_automat_                               Återstarta automat
+ RAA_automat_                               Radera automat
+ AOK_specialobjekt_                         Acceptera automatförfrågan
+ ANO_specialobjekt_                         Neka automatförfrågan
+
+
+
+7.9.2       Kommandon i automater
+ Kommando                                   Betydelse
+ ATI automat [rad]                          Starta automat (ev. från angiven rad)
+ ATR automat [rad]                          Starta underautomat (ev. från angiven rad)
+ ATE                                        Avbryt egen automat
+ ASV specialobjekt                          Visa automatstatus på bild
+ ADL meddelande                             Visa dialog OK/ neka dialog, meddelande max 30 tecken
+ ANO specialobjekt                          Neka automat förfrågan
+ AOK specialobjekt                          Acceptera automat förfrågan
+
+ KLF stationsbeteckning                     Koppla ifrån kontaktledning (nödstopp)
+
+ TRH signal...                              Ställ tågväg
+ TRF signal...                              Ställ tågväg med automatisk körsignalupprepning
+ VRK signal...                              Ställ växlingsväg
+ UTL signal                                 Nödutlös tågväg
+
+ SIS signal                                 Spärra signal i stopp
+ SIL signal...                              Signalering snett höger
+ SIU signal...                              Återtag signalering snett höger
+ PSS signal                                 Signalering av dvärg vid huvudsignal i stopp
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          321(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+ Kommando                                   Betydelse
+ SAT signal                                 Automatdrift för signal
+ SAU signal                                 Återtag automatdrift för signal
+
+ VXH växel...                               Lägg växel till höger / Lägg av spårspärr
+ VXV växel...                               Lägg växel till vänster / Lägg på spårspärr
+ VXL växel...                               Frige växel / spårspärr för lokal manövrering
+ VXC växel...                               Återtag lokalfrigivning av växel / spårspärr
+ VXS växel...                               Spärra växel/spårspärr
+ VXF växel...                               Återtag spärrning av växel/spårspärr
+ VFT vägskydd                               Koppla in fördröjd bomfällning
+ VST vägskydd                               Aktivera vägskydd
+ VSF vägskydd                               Återtag aktivering av vägskydd
+ VSL vägskydd                               Frige vägskydd för lokal manövrering
+ VSC vägskydd                               Återtag lokalfrigivning av vägskydd
+
+ VFF Signal                                 Återta fördröjd bomfällning
+
+ ASS A-signal                               Ställ tänd A-signal i stopp
+ ASN A-signal                               Återställ A-signal
+
+ LAT specialobjekt                          Starta lokal automat för tågvägar
+ LAU specialobjekt                          Avbryt lokal automat
+
+ LOT specialobjekt                          Starta lokalautomat för lokalfrigivning av objekt
+ LOU specialobjekt                          Avbryta lokalautomat för lokalfrigivning av objekt
+
+ VVH specialobjekt                          Koppla in växelvärme, heleffekt
+ VVU stn.beteckn./specialobj.               Koppla ur växelvärme, för station
+ VVQ specialobjekt                          Koppla in växelvärme, kvarts effekt
+ VVD specialobjekt                          Koppla in växelvärme, halv effekt
+ VVT stn.beteckn./specialobj.               Koppla in växelvärme, för station
+ VVF specialobjekt                          Koppla från växelvärme
+
+ RES stationsbeteckning                     Återstart av linjeenhet
+ NOR stationsbeteckning                     Sätt linjeenhet i normalläge
+ ABC stationsbeteckning                     Koppla in linjeenhetens A och B/C väg
+ LEA stationsbeteckning                     Koppla in linjeenhetens A väg och koppla bort B/C väg
+ LEB stationsbeteckning                     Koppla in linjeenhetens B/C väg och koppla bort A väg
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          322(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+ Kommando                                   Betydelse
+
+ TOT stationsbeteckning                     Ställ om station till total indikering
+ PAR stationsbeteckning                     Ställ om station till partiell indikering
+
+ TLS signal...                              Slå till TLS-drift på signal
+
+ TLF signal...                              Slå ifrån TLS-drift på signal
+ BTV TLS-volym                              Byt TLS-volym
+
+ TNB tågnummer tågnummer                    Byt tågnummer
+ TNR tågnummer                              Radera tågnummer
+ TNV tågnummer                              Vänd tågnummer
+ TND signal tågnummer                       Dela tågnummer vid signal
+ TNX Signal                                 Raderar samtliga tågnummer vid signal
+
+7.9.3       Logik
+ Kommando                                   Betydelse
+ FAL                                        Ifall något av villkoren uppfylls
+ NAR                                        När något av villkoren uppfylls
+ OMM                                        Om villkor(en) uppfylls
+ VAN                                        Vänta till villkor uppfylls
+ ANS                                        Annars i om-sats
+ ELR                                        Eller i om-sats
+ DAA                                        Då som påbörjar villkorssats
+ UTF                                        Utför då villkor uppfyllt
+ SLT                                        Slutpost
+
+7.9.4       Logiska operatorer
+ Kommando                                   Betydelse
+ ( a & b )                                  AND sats. Om a och b är uppfyllda, då sant
+ ( a | b )                                  OR sats. Om a och/ eller b är uppfyllda, då sant
+ ( a ^ b )                                  XOR sats. Om a eller b är uppfyllda, då sant
+ !( a & b )                                 NAND sats. Om ingen, a eller b är uppfyllda, då sant
+ !( a | b )                                 NOR sats. Om a och b är ej uppfyllda, då sant
+ !( a | b )                                 NXOR sats. Om a och b är uppfyllda eller ej uppfyllda, då sant
+
+7.9.5       Villkor
+ Kommando                                   Betydelse
+ QST                                        Större än (tågnummer, tågposition, hastighet)
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          323(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+                                                                                                    EBICOS 900 OPERATÖRSHANDBOK
+
+
+
+
+ Kommando                                   Betydelse
+ QMI                                        Mindre än (tågnummer, tågposition, hastighet)
+ QEQ                                        Lika med (tågnummer, tågposition, hastighet, tåg mod)
+ QNT signal                                 Tågnummerförändring vid signal
+
+ QAV automat                                Automat vilande
+ QAE automat                                Automat ej vilande
+
+ QAT timme:minut                            Absolut tid
+ QRT timmar: minuter                        Relativ tid
+ [:sekunder]
+ QDA Månad-dag                              Datum
+
+
+ QTB signal                                 Låst väg från signal
+ QTE signal                                 Ej låst väg från signal
+ QTS signal                                 Låst väg till signal
+ QTT signal                                 Ej låst väg till signal
+ QMB signal                                 Magasinerad börjanpunkt
+ QEM signal                                 Ej magasinerad börjanpunkt
+ QMS signal                                 Magasinerad slutpunkt
+ QME signal                                 Ej magasinerad slutpunkt
+
+ QSK signal                                 Signal i kör
+ QSS signal                                 Signal i stopp
+ QSH signal                                 Signal lokalfrigiven
+ QSE signal                                 Signal ej lokalfrigiven
+ QSA signal                                 Signal i TLS-drift
+ QSM signal                                 Signal ej i TLS-drift
+
+ QLB linjeblock                             Linjen belagd
+ QLF linjeblock                             Linjen fri
+ QLI linjeblock                             Linjeriktning in
+ QLU linjeblock                             Linjeriktning ut
+ QLL linjeblock                             Linjeriktning låst
+ QLO linjeblock                             Linjeriktning vändbar
+ QLN linjeblock                             Linjeblock ej spärrad
+ QLS linjeblock                             Linjeblock spärrad
+
+ QSB spårledning                            Spårledning belagd
+
+
+
+2024-09-06                    1553 - JPC 202 900               17.9.0.0             DRAFT                          324(433)
+© ALSTOM SA 2024. All rights reserved. Reproduction, use or disclosure to third parties, without express written authorisation, is
+strictly prohibited.
+
+
+
+                                       Dokumentet är elektroniskt undertecknat
+

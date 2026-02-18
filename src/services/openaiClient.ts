@@ -57,21 +57,22 @@ export async function runEbicosAssistant(
 
 function buildSystemPrompt(mode: string, snippets: string[]): string {
   const references = snippets
-    .map((snippet, index) => `REFERENCE ${index + 1}: ${snippet}`)
+    .map((snippet, index) => `REFERENS ${index + 1}: ${snippet}`)
     .join('\n\n')
 
   return [
-    'Du är en EBICOS 900 automationsspecialist.',
-    'Primär källa är VL_TR_2020-0028 (operatörshandbok).',
-    'Regel: Om något saknar stöd i referensen ska du säga osäkert och föreslå säker kontroll.',
-    'Skriv kort och exakt, ingen överflödig text.',
-    'Mode: ' + mode,
+    'Du är en specialist på EBICOS 900 automater och körplaner.',
+    'Primära källor är enbart Automater7.pdf (kapitel 7) och Korplan8.pdf (kapitel 8).',
+    'Regel 1: Hitta inte på kommandon, syntax eller villkor som saknar stöd i referenserna.',
+    'Regel 2: Om stöd saknas, skriv tydligt "osäkert" och föreslå säker verifiering i OPStation/AutoGen/TPGen.',
+    'Regel 3: Svara alltid på svenska.',
+    `Läge: ${modeLabel(mode)}`,
     'Returnera enbart giltig JSON med exakt detta schema:',
     '{"code":string,"risks":string[],"notes":string[],"evidence":string[]}',
-    'code ska vara färdig automationskod när möjligt.',
-    'risks ska vara konkreta drift-/syntaxrisker.',
-    'notes ska vara korta handhavandenoteringar.',
-    'evidence ska referera till manualinnehåll som användes.',
+    'code ska vara körbar kod när underlag räcker, annars minimal korrigerad version.',
+    'risks ska vara drift- eller syntaxrisker kopplade till EBICOS-regler.',
+    'notes ska vara korta operatörsnoteringar.',
+    'evidence ska peka ut vilka referensbitar (AUTOMATER7/KORPLAN8) som användes.',
     references,
   ].join('\n')
 }
@@ -87,19 +88,29 @@ function buildUserPrompt(request: RunRequest, validationIssues: ValidationIssue[
     : 'Inga lokala validatorfel.'
 
   return [
-    `Uppgift: ${request.mode}`,
-    'Intention:',
+    `Uppgift: ${modeLabel(request.mode)}`,
+    'Avsikt:',
     request.intent || '(saknas)',
     '',
     'Kod:',
     request.sourceCode || '(saknas)',
     '',
-    'Operatörsnotering:',
+    'Operatörsnoteringar:',
     request.notes || '(saknas)',
     '',
     'Lokala kontroller:',
     issuesText,
   ].join('\n')
+}
+
+function modeLabel(mode: string): string {
+  if (mode === 'create') {
+    return 'Skapa'
+  }
+  if (mode === 'edit') {
+    return 'Redigera'
+  }
+  return 'Felsök'
 }
 
 function extractText(response: OpenAiResponse): string {

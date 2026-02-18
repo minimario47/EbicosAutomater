@@ -13,16 +13,16 @@ export function StatusStrip({ issues, error, lastSavedAt }: StatusStripProps) {
   return (
     <section className="status-strip" aria-live="polite">
       <div>
-        <span className="status-label">CHECK</span>
+        <span className="status-label">KONTROLL</span>
         <span>{errorCount}E / {warningCount}W</span>
       </div>
       <div>
-        <span className="status-label">SAVE</span>
+        <span className="status-label">SPARAD</span>
         <span>{formatTime(lastSavedAt)}</span>
       </div>
       <div className="status-wide">
-        <span className="status-label">STATE</span>
-        <span>{error ? error : issues[0]?.message ?? 'READY'}</span>
+        <span className="status-label">STATUS</span>
+        <span>{error ? error : issues[0]?.message ?? 'KLAR'}</span>
       </div>
     </section>
   )
@@ -30,12 +30,12 @@ export function StatusStrip({ issues, error, lastSavedAt }: StatusStripProps) {
 
 function formatTime(value: string): string {
   if (!value || value.startsWith('1970-')) {
-    return 'NEW'
+    return 'NY'
   }
 
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) {
-    return 'NEW'
+    return 'NY'
   }
 
   return date.toLocaleString('sv-SE', {

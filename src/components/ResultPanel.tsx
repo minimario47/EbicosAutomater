@@ -1,13 +1,17 @@
 import { useState } from 'react'
-import type { AiResult, ValidationIssue } from '../types/workbench'
+import { downloadResultPdf } from '../services/pdfExport'
+import type { AiResult, AutomationMode, ValidationIssue } from '../types/workbench'
 
 interface ResultPanelProps {
+  mode: AutomationMode
+  intent: string
+  sourceCode: string
   result: AiResult | null
   issues: ValidationIssue[]
 }
 
-export function ResultPanel({ result, issues }: ResultPanelProps) {
-  const [copyState, setCopyState] = useState('COPY')
+export function ResultPanel({ mode, intent, sourceCode, result, issues }: ResultPanelProps) {
+  const [copyState, setCopyState] = useState('KOPIERA')
 
   const handleCopy = async () => {
     if (!result?.code) {
@@ -16,41 +20,56 @@ export function ResultPanel({ result, issues }: ResultPanelProps) {
 
     try {
       await navigator.clipboard.writeText(result.code)
-      setCopyState('COPIED')
-      setTimeout(() => setCopyState('COPY'), 1200)
+      setCopyState('KOPIERAD')
+      setTimeout(() => setCopyState('KOPIERA'), 1200)
     } catch {
-      setCopyState('LOCKED')
-      setTimeout(() => setCopyState('COPY'), 1200)
+      setCopyState('LÅST')
+      setTimeout(() => setCopyState('KOPIERA'), 1200)
     }
   }
 
+  const handleExportPdf = () => {
+    downloadResultPdf({
+      mode,
+      intent,
+      sourceCode,
+      result,
+      issues,
+    })
+  }
+
   return (
-    <section className="result-panel" aria-label="Result">
+    <section className="result-panel" aria-label="Resultat">
       <div className="panel-head">
-        <h2>OUTPUT</h2>
-        <button type="button" className="ghost-button" onClick={handleCopy}>
-          {copyState}
-        </button>
+        <h2>RESULTAT</h2>
+        <div className="panel-actions">
+          <button type="button" className="ghost-button" onClick={handleExportPdf}>
+            LADDA PDF
+          </button>
+          <button type="button" className="ghost-button" onClick={handleCopy}>
+            {copyState}
+          </button>
+        </div>
       </div>
 
       <article className="result-block">
-        <h3>CODE</h3>
-        <pre>{result?.code || 'NO OUTPUT YET'}</pre>
+        <h3>KOD</h3>
+        <pre>{result?.code || 'INGEN UTDATA ÄN'}</pre>
       </article>
 
       <article className="result-block">
-        <h3>RISKS</h3>
-        {renderList(result?.risks?.length ? result.risks : issues.map((issue) => issue.message), 'NO RISKS')}
+        <h3>RISKER</h3>
+        {renderList(result?.risks?.length ? result.risks : issues.map((issue) => issue.message), 'INGA RISKER')}
       </article>
 
       <article className="result-block">
-        <h3>NOTES</h3>
-        {renderList(result?.notes, 'NO NOTES')}
+        <h3>NOTERINGAR</h3>
+        {renderList(result?.notes, 'INGA NOTERINGAR')}
       </article>
 
       <article className="result-block">
-        <h3>EVIDENCE</h3>
-        {renderList(result?.evidence, 'VL_TR_2020-0028 CONTEXT PENDING')}
+        <h3>KÄLLSTÖD</h3>
+        {renderList(result?.evidence, 'KÄLLKONTEXT EJ LADAD')}
       </article>
     </section>
   )

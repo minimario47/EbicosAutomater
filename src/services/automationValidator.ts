@@ -2,6 +2,23 @@ import { type ValidationIssue } from '../types/workbench'
 
 const ACTION_COMMANDS = new Set([
   'START',
+  'INTIME',
+  'INTRSIG',
+  'DESSIG',
+  'TRINF',
+  'RPS',
+  'SIG',
+  'STN',
+  'DGN',
+  'HTR',
+  'KVR',
+  'ALT',
+  'NRM',
+  'TBN',
+  'TDN',
+  'TRN',
+  'TVN',
+  'STO',
   'SLUT',
   'ATI',
   'ATR',
@@ -65,6 +82,28 @@ const ACTION_COMMANDS = new Set([
 ])
 
 const LOGIC_COMMANDS = new Set(['OMM', 'FAL', 'VAN', 'NAR', 'ELR', 'UTF', 'ANS', 'DAA', 'SLT'])
+
+const PREFIX_COMMANDS = new Set([
+  'START',
+  'SIG',
+  'STN',
+  'DGN',
+  'HTR',
+  'KVR',
+  'ALT',
+  'TBN',
+  'TDN',
+  'BTK',
+  'VKP',
+  'RAK',
+  'TLS',
+  'TLF',
+  'TSF',
+  'TSS',
+  'BTV',
+  'TOP',
+  'NSI',
+])
 
 const CONDITION_COMMANDS = new Set([
   'QST',
@@ -245,6 +284,18 @@ export function validateAutomation(sourceCode: string): ValidationIssue[] {
       }
     }
 
+    if (token.startsWith('START_')) {
+      const name = token.slice('START_'.length)
+      if (!name) {
+        issues.push({
+          level: 'error',
+          line: lineNumber,
+          message: 'START_ saknar identitet.',
+          evidence: 'Kap. 8.3.2.1',
+        })
+      }
+    }
+
     if (!isKnownToken(token) && !isExpressionLine(clean)) {
       issues.push({
         level: 'warning',
@@ -357,7 +408,20 @@ function firstToken(line: string): string {
 }
 
 function isKnownToken(token: string): boolean {
+  if (isPrefixToken(token)) {
+    return true
+  }
   return ACTION_COMMANDS.has(token) || LOGIC_COMMANDS.has(token) || CONDITION_COMMANDS.has(token)
+}
+
+function isPrefixToken(token: string): boolean {
+  const split = token.split('_')
+  if (!split.length || split.length === 1) {
+    return false
+  }
+
+  const prefix = split[0]
+  return PREFIX_COMMANDS.has(prefix)
 }
 
 function isExpressionLine(line: string): boolean {

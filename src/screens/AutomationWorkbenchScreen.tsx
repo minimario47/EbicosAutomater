@@ -44,7 +44,13 @@ export function AutomationWorkbenchScreen() {
               onRun={run}
             />
 
-            <ResultPanel result={state.result} issues={state.issues} />
+            <ResultPanel
+              mode={state.mode}
+              intent={state.intent}
+              sourceCode={state.sourceCode}
+              result={state.result}
+              issues={state.issues}
+            />
           </div>
         </div>
       </section>

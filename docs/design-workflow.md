@@ -33,12 +33,12 @@
 - Passive path (doing nothing): Existing draft remains visible; no hidden resets.
 - Failure path:
   - Local validator flags structural errors.
-  - AI response includes "uncertain" markers when manual evidence is weak.
+  - AI response includes "uncertain" markers when evidence from Automater7/Korplan8 is weak.
 - Return-after-absence (3 days later): Last work state is restored from local persistence with timestamp and mode.
 
 ## Step 4 — Risk & Friction Analysis
 - Hesitation risk: "Will this hallucinate commands?"
-  - Design response: EBICOS manual is loaded as primary context, and output requires evidence-backed reasoning.
+  - Design response: Automater7 + Korplan8 are loaded as primary context, and output requires evidence-backed reasoning.
 - Confusion risk: Create vs edit vs debug intent overlap.
   - Design response: Mode rail with explicit mode labels and mode-specific prompts.
 - Overwhelm risk: Long automation code and dense output.

@@ -1,6 +1,16 @@
-const KNOWLEDGE_PATH = '/knowledge/VL_TR_2020-0028.txt'
+const KNOWLEDGE_SOURCES = [
+  {
+    id: 'AUTOMATER7',
+    path: '/knowledge/Automater7.txt',
+  },
+  {
+    id: 'KORPLAN8',
+    path: '/knowledge/Korplan8.txt',
+  },
+] as const
 
 interface KnowledgeChunk {
+  sourceId: string
   id: number
   text: string
   terms: string[]
@@ -41,17 +51,24 @@ async function loadChunks(): Promise<KnowledgeChunk[]> {
     return chunksCache
   }
 
-  const response = await fetch(KNOWLEDGE_PATH)
-  if (!response.ok) {
-    throw new Error('Kunde inte läsa EBICOS-referensen.')
-  }
+  const loaded = await Promise.all(
+    KNOWLEDGE_SOURCES.map(async (source) => {
+      const response = await fetch(source.path)
+      if (!response.ok) {
+        throw new Error(`Kunde inte läsa EBICOS-referensen: ${source.path}`)
+      }
+      return {
+        sourceId: source.id,
+        text: await response.text(),
+      }
+    }),
+  )
 
-  const source = await response.text()
-  chunksCache = chunkText(source)
+  chunksCache = loaded.flatMap((source) => chunkText(source.text, source.sourceId))
   return chunksCache
 }
 
-function chunkText(source: string): KnowledgeChunk[] {
+function chunkText(source: string, sourceId: string): KnowledgeChunk[] {
   const lines = source
     .replace(/\r/g, '')
     .split('\n')
@@ -67,8 +84,9 @@ function chunkText(source: string): KnowledgeChunk[] {
 
     if (isHeading && current.length > 0) {
       chunks.push({
+        sourceId,
         id,
-        text: shrinkChunk(current),
+        text: `[${sourceId}] ${shrinkChunk(current)}`,
         terms: normalize(current),
       })
       id += 1
@@ -78,8 +96,9 @@ function chunkText(source: string): KnowledgeChunk[] {
     const next = `${current}\n${line}`.trim()
     if (next.length > 1200) {
       chunks.push({
+        sourceId,
         id,
-        text: shrinkChunk(current),
+        text: `[${sourceId}] ${shrinkChunk(current)}`,
         terms: normalize(current),
       })
       id += 1
@@ -91,8 +110,9 @@ function chunkText(source: string): KnowledgeChunk[] {
 
   if (current) {
     chunks.push({
+      sourceId,
       id,
-      text: shrinkChunk(current),
+      text: `[${sourceId}] ${shrinkChunk(current)}`,
       terms: normalize(current),
     })
   }
