@@ -123,12 +123,13 @@
 
 .status-strip .status-wide {
   grid-column: span 2;
+  align-items: flex-start;
 }
 
 .status-strip .status-wide span:last-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: right;
 }
 
 .status-label {

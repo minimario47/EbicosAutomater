@@ -26,7 +26,6 @@ export async function runEbicosAssistant(
     },
     body: JSON.stringify({
       model: request.model,
-      temperature: 0.1,
       input: [
         {
           role: 'system',

@@ -58,7 +58,11 @@ export function saveSessionApiKey(apiKey: string): void {
 }
 
 export function loadModel(): string {
-  return localStorage.getItem(MODEL_KEY) ?? 'gpt-5.3-codex'
+  const saved = localStorage.getItem(MODEL_KEY)
+  if (!saved || saved === 'gpt-5.3-codex') {
+    return 'gpt-5.2-codex'
+  }
+  return saved
 }
 
 export function saveModel(model: string): void {

@@ -97,7 +97,7 @@ export function InputPanel({
             className="single-input"
             value={model}
             onChange={(event) => onModelChange(event.target.value)}
-            placeholder="gpt-5.3-codex"
+            placeholder="gpt-5.2-codex"
           />
         </div>
 
