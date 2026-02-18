@@ -65,6 +65,8 @@ function buildSystemPrompt(mode: string, snippets: string[]): string {
     'Regel 1: Hitta inte på kommandon, syntax eller villkor som saknar stöd i referenserna.',
     'Regel 2: Om stöd saknas, skriv tydligt "osäkert" och föreslå säker verifiering i OPStation/AutoGen/TPGen.',
     'Regel 3: Svara alltid på svenska.',
+    'Regel 4: I läget Skapa, om kod saknas men avsikt finns, skapa en ny automat enligt kap 7.6 + 7.9.',
+    'Regel 5: Vid saknade objekt-id, använd tydliga platshållare (t.ex. XXX) men behåll korrekt syntax.',
     `Läge: ${modeLabel(mode)}`,
     'Returnera enbart giltig JSON med exakt detta schema:',
     '{"code":string,"risks":string[],"notes":string[],"evidence":string[]}',
@@ -77,6 +79,7 @@ function buildSystemPrompt(mode: string, snippets: string[]): string {
 }
 
 function buildUserPrompt(request: RunRequest, validationIssues: ValidationIssue[]): string {
+  const creatingFromIntentOnly = request.mode === 'create' && !request.sourceCode.trim() && !!request.intent.trim()
   const issuesText = validationIssues.length
     ? validationIssues
         .map((issue) => {
@@ -88,6 +91,9 @@ function buildUserPrompt(request: RunRequest, validationIssues: ValidationIssue[
 
   return [
     `Uppgift: ${modeLabel(request.mode)}`,
+    creatingFromIntentOnly
+      ? 'Kodläge: Ingen källkod given. Skapa komplett automat utifrån avsikten.'
+      : 'Kodläge: Befintlig källkod finns.',
     'Avsikt:',
     request.intent || '(saknas)',
     '',

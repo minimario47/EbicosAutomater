@@ -169,7 +169,11 @@ interface LogicState {
   daaCount: number
 }
 
-export function validateAutomation(sourceCode: string): ValidationIssue[] {
+interface ValidationOptions {
+  allowEmpty?: boolean
+}
+
+export function validateAutomation(sourceCode: string, options: ValidationOptions = {}): ValidationIssue[] {
   const issues: ValidationIssue[] = []
   const lines = sourceCode.replace(/\r/g, '').split('\n')
   let firstCodeLine = 0
@@ -315,6 +319,10 @@ export function validateAutomation(sourceCode: string): ValidationIssue[] {
   })
 
   if (!firstCodeLine) {
+    if (options.allowEmpty) {
+      return issues
+    }
+
     issues.push({
       level: 'error',
       message: 'Tom automationsfil.',

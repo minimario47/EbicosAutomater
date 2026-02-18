@@ -38,7 +38,7 @@ export function useAutomationWorkbench() {
     apiKey: loadSessionApiKey(),
     model: loadModel(),
     result: null,
-    issues: validateAutomation(draft.sourceCode),
+    issues: computeIssues(draft.mode, draft.sourceCode),
     isRunning: false,
     error: '',
     lastSavedAt: draft.updatedAt,
@@ -69,12 +69,21 @@ export function useAutomationWorkbench() {
   }, [state.mode, state.sourceCode, state.intent, state.notes, state.apiKey, state.model])
 
   const setMode = (mode: AutomationMode) => {
-    setState((current) => ({ ...current, mode, lastSavedAt: nowStamp() }))
+    setState((current) => ({
+      ...current,
+      mode,
+      issues: computeIssues(mode, current.sourceCode),
+      lastSavedAt: nowStamp(),
+    }))
   }
 
   const setSourceCode = (sourceCode: string) => {
-    const issues = validateAutomation(sourceCode)
-    setState((current) => ({ ...current, sourceCode, issues, lastSavedAt: nowStamp() }))
+    setState((current) => ({
+      ...current,
+      sourceCode,
+      issues: computeIssues(current.mode, sourceCode),
+      lastSavedAt: nowStamp(),
+    }))
   }
 
   const setIntent = (intent: string) => {
@@ -108,7 +117,12 @@ export function useAutomationWorkbench() {
       return
     }
 
-    const issues = validateAutomation(state.sourceCode)
+    if (!state.sourceCode.trim() && !state.intent.trim()) {
+      setState((current) => ({ ...current, error: 'Fyll i avsikt eller kod innan körning.' }))
+      return
+    }
+
+    const issues = computeIssues(state.mode, state.sourceCode)
 
     setState((current) => ({
       ...current,
@@ -118,8 +132,9 @@ export function useAutomationWorkbench() {
     }))
 
     try {
+      const seed = state.mode === 'create' ? '7.4 7.6 7.7 7.9 START SLUT OMM FAL VAN NAR ATN HOP ATI ATB ATA' : ''
       const context = await retrieveEbicosContext(
-        `${state.mode} ${state.intent} ${state.sourceCode} ${state.notes} ${issues.map((issue) => issue.message).join(' ')}`,
+        `${state.mode} ${seed} ${state.intent} ${state.sourceCode} ${state.notes} ${issues.map((issue) => issue.message).join(' ')}`,
       )
 
       const request: RunRequest = {
@@ -163,4 +178,9 @@ export function useAutomationWorkbench() {
 
 function nowStamp(): string {
   return new Date().toISOString()
+}
+
+function computeIssues(mode: AutomationMode, sourceCode: string): ValidationIssue[] {
+  const allowEmpty = mode === 'create' && sourceCode.trim().length === 0
+  return validateAutomation(sourceCode, { allowEmpty })
 }
